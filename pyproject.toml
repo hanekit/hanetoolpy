@@ -6,5 +6,8 @@ build-backend = "setuptools.build_meta"
 name = "hanetoolpy"
 version = "0.0.1"
 
+[tool.setuptools.packages.find]
+where = ["src"]
+
 [project.scripts]
-hnt = "hanetoolpy.main:main"
+hanetoolpy = "hanetoolpy.main:main"
