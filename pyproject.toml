@@ -1,0 +1,10 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hanetoolpy"
+version = "0.0.1"
+
+[project.scripts]
+hnt = "hanetoolpy.main:main"
