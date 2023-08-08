@@ -1,13 +1,13 @@
 [build-system]
-requires = ["setuptools"]
-build-backend = "setuptools.build_meta"
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
 
-[project]
+[tool.poetry]
 name = "hanetoolpy"
 version = "0.0.1"
+description = "test"
+authors = ["hanekit"]
 
-[tool.setuptools.packages.find]
-where = ["src"]
-
-[project.scripts]
+[tool.poetry.scripts]
 hanetoolpy = "hanetoolpy.main:main"
+hnt = "hanetoolpy.main:main"
