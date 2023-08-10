@@ -1,0 +1,4 @@
+[config]
+default_ppn = 8
+default_vasp_command = "vasp641.x_std"
+

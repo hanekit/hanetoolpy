@@ -24,10 +24,25 @@ def get_parser():
                         metavar="function_number",
                         dest="task")
     parser.add_argument("--pbs",
-                        type=str,
+                        dest="pbs",
+                        action="store_true",
                         help="# TODO",
-                        metavar="file.sh",
-                        dest="pbs_file")
+                        )
+    parser.add_argument("--file",
+                        dest="file",
+                        type=str,
+                        help="# TODO"
+                        )
+    parser.add_argument("--command",
+                        dest="command",
+                        type=str,
+                        help="# TODO"
+                        )
+    parser.add_argument("--vasp-run",
+                        dest="vasp_run",
+                        action="store_true",
+                        help="# TODO",
+                        )
     parser.add_argument("--btp2-doseffmass",
                         dest="btp2_doseffmass",
                         type=str,
@@ -39,4 +54,4 @@ def get_parser():
 
 
 if __name__ == "__main__":
-    main()
+    pass
