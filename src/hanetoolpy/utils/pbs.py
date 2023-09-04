@@ -7,7 +7,6 @@ from typing import Any
 # Third-party imports
 from rich.console import Console
 
-
 # Application-specific imports
 
 
