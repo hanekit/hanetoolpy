@@ -11,3 +11,8 @@ authors = ["hanekit"]
 [tool.poetry.scripts]
 hanetoolpy = "hanetoolpy.main:main"
 hnt = "hanetoolpy.main:main"
+
+[tool.poetry.dependencies]
+python = "^3.0"
+rich = ">=10.0.0"
+toml = ">=0.10.0"
