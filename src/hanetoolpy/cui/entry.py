@@ -1,5 +1,8 @@
 import textwrap
-import readline
+try:
+    import readline
+except:
+    pass
 
 from hanetoolpy.about import full_version
 from hanetoolpy.cui.text import header, divider
@@ -15,7 +18,8 @@ def print_header():
 
 
 def print_options():
-    print(" (0) Quit")
+    print(" (q) Quit")
+    print(" (t) Test")
     print(" (1) BoltzTraP")
     option = input(" ------------>>\n")
     try:
@@ -34,7 +38,14 @@ def boltztrap():
     print("BoltzTraP")
 
 
+def test_tool():
+    from subprocess import run
+    command = test_str()
+    completed_process = run(command, shell=True)
+
+
 option_dic = {
-    "0": quit,
+    "q": quit,
+    "t": test_tool,
     "1": boltztrap
 }
