@@ -6,6 +6,9 @@ except:
 
 from hanetoolpy.about import full_version
 from hanetoolpy.cui.text import header, divider
+from hanetoolpy.cui.options import print_options
+from hanetoolpy.functions.vasp import vasp
+
 
 width = 80
 
@@ -17,25 +20,6 @@ def print_header():
     print(divider())
 
 
-def print_options():
-    print(" (q) Quit")
-    print(" (t) Test")
-    print(" (1) BoltzTraP")
-    option = input(" ------------>>\n")
-    try:
-        option_dic[option]()
-    except KeyError:
-        print("Error: 非法参数，请重新输入。")
-        print_options()
-
-
-def start_cui():
-    print_header()
-    print_options()
-
-
-def boltztrap():
-    print("BoltzTraP")
 
 
 def test_tool():
@@ -44,8 +28,18 @@ def test_tool():
     completed_process = run(command, shell=True)
 
 
-option_dic = {
-    "q": quit,
-    "t": test_tool,
-    "1": boltztrap
+def boltztrap():
+    print("BoltzTraP")
+
+
+main_option_dic = {
+    "q": {"name": "Quit", "function": quit},
+    "t": {"name": "Test", "function": test_tool},
+    "1": {"name": "VASP", "function": vasp},
+    "2": {"name": "BoltzTraP", "function": boltztrap},
 }
+
+
+def start_cui():
+    print_header()
+    print_options(main_option_dic)
