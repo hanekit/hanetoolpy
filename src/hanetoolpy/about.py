@@ -1,5 +1,5 @@
 program_name = "hanetoolpy"
-version_number = "0.0.2"
+version_number = "0.0.3"
 build_date = "2023.09.04"
 
 version_text = f"version {version_number}"

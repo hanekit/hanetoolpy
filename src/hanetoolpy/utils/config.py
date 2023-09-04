@@ -10,12 +10,19 @@ class ConfigLoader:
     def __init__(self):
         current_file_path = Path(__file__).resolve()
         package_root = current_file_path.parent.parent
-        with open(package_root / 'hanetoolpy.default.config.toml', 'r') as file:
+        default_config_path = package_root / 'hanetoolpy.default.config.toml'
+        custom_config_path = package_root / 'hanetoolpy.custom.config.toml'
+        # 读取默认设置
+        with open(package_root / default_config_path, 'r') as file:
             default_config = toml.load(file)
-        with open(package_root / 'hanetoolpy.custom.config.toml', 'r') as file:
-            custom_config = toml.load(file)
-        self.config = default_config.copy()
-        self.config.update(custom_config)
+            self.config = default_config.copy()
+        # 读取自定义设置
+        if custom_config_path.exists():
+            with open(custom_config_path, 'r') as file:
+                custom_config = toml.load(file)
+                self.config.update(custom_config)
+        else:
+            custom_config_path.touch()
 
 
 def get_config():
