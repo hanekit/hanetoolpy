@@ -3,7 +3,8 @@ from .global_band_plotter import plot as global_band_plotter
 from functools import partial
 
 vasp_option_dic = {
-    "1": {"name": "Plot Global Band", "function": partial(global_band_plotter, index="VB")},
+    "1": {"name": "Plot Global Band (VB)", "function": partial(global_band_plotter, index="VB")},
+    "2": {"name": "Plot Global Band (CB)", "function": partial(global_band_plotter, index="CB")},
 }
 
 def vasp():
