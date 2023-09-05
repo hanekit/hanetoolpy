@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "hanetoolpy"
-version = "0.0.2"
+version = "0.0.3"
 description = "test"
 authors = ["hanekit"]
 
@@ -17,3 +17,6 @@ python = "^3.0"
 rich = ">=10.0.0"
 toml = ">=0.10.0"
 readline = ">=6.0.0"
+numpy = ">=1.0.0"
+pandas = ">=2.0.0"
+matplotlib = ">=3.0.0"
