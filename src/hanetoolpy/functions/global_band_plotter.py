@@ -228,6 +228,10 @@ def plot(index: str = "VB",
     # 颜色映射
     if color:
         data_layer = ax.tricontourf(x, y, e, levels=100, cmap=cmap)
+        # 图例
+        cbar = fig.colorbar(data_layer)
+        cbar.outline.set_linewidth(1.5)
+        # cbar.set_label("Energy",loc="bottom")
     # 布里渊区
     外边缘 = 生成六边形()
     ax.add_patch(外边缘)
@@ -264,10 +268,6 @@ def plot(index: str = "VB",
         draw_dot(ax, min_xy, "CBM")
         print("The data of CBM:")
         print(min_point)
-    # 图例
-    cbar = fig.colorbar(data_layer)
-    cbar.outline.set_linewidth(1.5)
-    # cbar.set_label("test",loc="bottom")
     # 显示图片
     # plt.show(block=True)
     plt.savefig(f"GlobalBand_{index}.png", dpi=600)
