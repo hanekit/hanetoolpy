@@ -173,14 +173,14 @@ def draw_dot(ax, xy, text):
                 fontsize=15)
 
 
-def plot(index,
-         soc=False,
-         axis=False,
-         dot=False,
-         line=False,
-         color=True,
-         sym=None,
-         minus_fermi=True):
+def plot(index: str = "Both",
+         soc: bool = False,
+         axis: bool = False,
+         dot: bool = False,
+         line: bool = False,
+         color: bool = True,
+         minus_fermi: bool = True,
+         sym: str = "hex",):
     # 读取文件
     eigenval = Eigenval(soc=soc)
     # 获取数据
