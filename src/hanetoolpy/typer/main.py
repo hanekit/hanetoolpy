@@ -29,7 +29,7 @@ vasp = typer.Typer(no_args_is_help=True,
 app.add_typer(vasp, name="vasp", help="VASP tools")
 
 # 添加 vasp-f101 子命令
-vasp.command("f101", no_args_is_help=True)(plot)
+vasp.command("f101")(plot)
 
 if __name__ == "__main__":
     app()

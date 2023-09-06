@@ -173,7 +173,7 @@ def draw_dot(ax, xy, text):
                 fontsize=15)
 
 
-def plot(index: str = "Both",
+def plot(index: str = "VB",
          soc: bool = False,
          axis: bool = False,
          dot: bool = False,
@@ -270,7 +270,7 @@ def plot(index: str = "Both",
     # cbar.set_label("test",loc="bottom")
     # 显示图片
     # plt.show(block=True)
-    plt.savefig("GlobalBand.png", dpi=600)
+    plt.savefig(f"GlobalBand_{index}.png", dpi=600)
 
 
 if __name__ == '__main__':
