@@ -164,7 +164,7 @@ def 添加能带路径(ax):
 
 def draw_dot(ax, xy, text):
     ax.plot(*xy, 'o', color="black", markerfacecolor='white')
-    # 添加图例
+    # 添加点的图例
     label_xy = (0.30, 0.52)
     ax.plot(*label_xy, 'o', color="black", markerfacecolor='white')
     ax.annotate(text,
@@ -175,7 +175,7 @@ def draw_dot(ax, xy, text):
                 fontsize=15)
 
 
-def plot(sym: Annotated[str, typer.Option(help="体系的对称性")] = "hex",
+def plot(sym: Annotated[str, typer.Option(help="Symmetry of the system")] = "hex",
          index: Annotated[str, typer.Option(help="VB/CB")] = "VB",
          soc: bool = False,
          axis: bool = False,
@@ -184,6 +184,9 @@ def plot(sym: Annotated[str, typer.Option(help="体系的对称性")] = "hex",
          color: bool = True,
          minus_fermi: bool = True,
          save_name: str = "Default"):
+    """
+    plot the band of 2D material.
+    """
     # 读取文件
     eigenval = Eigenval(soc=soc)
     # 获取数据
