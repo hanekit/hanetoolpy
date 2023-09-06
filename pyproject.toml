@@ -10,7 +10,8 @@ authors = ["hanekit"]
 
 [tool.poetry.scripts]
 hanetoolpy = "hanetoolpy.main:main"
-hnt = "hanetoolpy.main:main"
+hntold = "hanetoolpy.main:main"
+hnt = "hanetoolpy.typer.main:app"
 
 [tool.poetry.dependencies]
 python = "^3.0"
