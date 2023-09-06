@@ -71,13 +71,16 @@ def rotate_xy(xy, angle):
     return x2, y2
 
 
-def ab_to_xy(df, sym=None):
+def ab_to_xy(df, sym):
     df = df.copy()
-    if sym.lower() == "hex":
+    if sym == "hex":  # 六角胞
         df['k_x'] = df['k_a'] + 0.5 * df['k_b']
         df['k_y'] = (3 ** 0.5) / 2 * df['k_b']
+    elif sym == "rec":  # 矩形胞
+        df['k_x'] = df['k_a']
+        df['k_y'] = df['k_b']
     else:
-        raise NotImplementedError("暂时只支持六角胞")
+        raise NotImplementedError(f"Unsupported Symmetry {sym}")
     return df
 
 
@@ -117,55 +120,91 @@ def get_fermi(path="./FERMI_ENERGY"):
     return fermi
 
 
-def 生成六边形(length=1):
-    # 计算六边形端点的坐标
-    point_complex = length * np.sqrt(3) / 3 * np.exp(1j * np.pi * (1./6 + 1./3 * np.arange(7)))
-    point_xy = np.c_[point_complex.real, point_complex.imag]
-    # 创建六边形对象
-    border = Polygon(point_xy,
+def 添加外边缘(ax, sym):
+    length = 1
+    if sym == "hex":  # 六角胞
+        point_complex = length * np.sqrt(3) / 3 * np.exp(1j * np.pi * (1./6 + 1./3 * np.arange(7)))
+        points = np.c_[point_complex.real, point_complex.imag]
+    elif sym == "rec":  # 矩形胞
+        l = 0.5 * length
+        points = [(l, l), (-l, l), (-l, -l), (l, -l)]
+    else:
+        raise NotImplementedError(f"Unsupported Symmetry {sym}")
+    border = Polygon(points,
                      lw=2,  # 线宽
                      edgecolor='black',  # 边缘颜色
                      clip_on=False,  # 允许绘制的图形超出绘图轴的范围
                      facecolor='none')  # 不填充内部，只绘制边缘
-    return border
+    ax.add_patch(border)
 
 
-def 添加能带路径(ax):
-    g = (0, 0)
-    m = (0.5, 0)
-    k = (0.5, 0.5/3**0.5)
-    path = Polygon([g, m, k],
+def 添加能带路径(ax, sym):
+    if sym == "hex":  # 六角胞
+        g = (0, 0)
+        m = (0.5, 0)
+        k = (0.5, 0.5/3**0.5)
+        points = [g, m, k]
+        # 绘制高对称点字符
+        ax.annotate("Γ",
+                    xy=g,
+                    xycoords='data',
+                    xytext=(0, 10),
+                    textcoords='offset points')
+        ax.annotate("M",
+                    xy=m,
+                    xycoords='data',
+                    xytext=(5, 5),
+                    textcoords='offset points')
+        ax.annotate("K",
+                    xy=k,
+                    xycoords='data',
+                    xytext=(5, 5),
+                    textcoords='offset points')
+    elif sym == "rec":  # 矩形胞
+        g = (0, 0)
+        x = (0.5, 0)
+        y = (0, 0.5)
+        s = (0.5, 0.5)
+        points = [g, x, s, y]
+        # 绘制高对称点字符
+        ax.annotate("Γ",
+                    xy=g,
+                    xycoords='data',
+                    xytext=(5, 5),
+                    textcoords='offset points')
+        ax.annotate("X",
+                    xy=x,
+                    xycoords='data',
+                    xytext=(5, 5),
+                    textcoords='offset points')
+        ax.annotate("S",
+                    xy=s,
+                    xycoords='data',
+                    xytext=(5, 5),
+                    textcoords='offset points')
+        ax.annotate("Y",
+                    xy=y,
+                    xycoords='data',
+                    xytext=(5, 5),
+                    textcoords='offset points')
+    else:
+        raise NotImplementedError(f"Unsupported Symmetry {sym}")
+    # 绘制路径
+    path = Polygon(points,
                    lw=2,  # 线宽
                    edgecolor='black',  # 边缘颜色为红色
                    clip_on=False,  # 允许绘制的图形超出绘图轴的范围
                    facecolor='none')  # 不填充多边形，只绘制边缘
     ax.add_patch(path)
     # 绘制高对称点
-    ax.plot(*g, 'o', color="black")
-    ax.plot(*m, 'o', color="black")
-    ax.plot(*k, 'o', color="black")
-    # 绘制高对称点字符
-    ax.annotate("Γ",
-                xy=g,
-                xycoords='data',
-                xytext=(0, 10),
-                textcoords='offset points')
-    ax.annotate("M",
-                xy=m,
-                xycoords='data',
-                xytext=(5, 5),
-                textcoords='offset points')
-    ax.annotate("K",
-                xy=k,
-                xycoords='data',
-                xytext=(5, 5),
-                textcoords='offset points')
+    for point in points:
+        ax.plot(*point, 'o', color="black")
 
 
 def draw_dot(ax, xy, text):
     ax.plot(*xy, 'o', color="black", markerfacecolor='white')
     # 添加点的图例
-    label_xy = (0.30, 0.52)
+    label_xy = (0.30, 0.55)
     ax.plot(*label_xy, 'o', color="black", markerfacecolor='white')
     ax.annotate(text,
                 xy=label_xy,
@@ -187,6 +226,8 @@ def plot(sym: Annotated[str, typer.Option(help="Symmetry of the system")] = "hex
     """
     plot the band of 2D material.
     """
+    sym = sym.lower()
+    print(sym)
     # 读取文件
     eigenval = Eigenval(soc=soc)
     # 获取数据
@@ -200,10 +241,14 @@ def plot(sym: Annotated[str, typer.Option(help="Symmetry of the system")] = "hex
     max_xy = (max_point.k_x, max_point.k_y)
     min_point = points_df.loc[points_df['energy'].idxmin()]
     min_xy = (min_point.k_x, min_point.k_y)
-    # 镜面对称
-    points = np.vstack((points, mirror(points)))
-    # 旋转对称
-    points = np.vstack((points, rotate(points, angles=list(range(60, 360, 60)))))
+    if sym == "hex":  # 六角胞
+        points = np.vstack((points, mirror(points)))  # 镜面对称
+        points = np.vstack((points, rotate(points, angles=[60, 120, 180, 240, 300])))  # 旋转对称
+    elif sym == "rec":  # 矩形胞
+        points = np.vstack((points, mirror(points)))  # 镜面对称
+        points = np.vstack((points, rotate(points, angles=[180])))  # 旋转对称
+    else:
+        raise NotImplementedError(f"Unsupported Symmetry {sym}")
     # 去除重复值
     points = np.unique(points, axis=0)
     # 生成数据
@@ -224,8 +269,14 @@ def plot(sym: Annotated[str, typer.Option(help="Symmetry of the system")] = "hex
         ax.axis('off')  # 关闭数据轴
     cmap = get_colormap()  # 生成色卡
     # 修改字体
-    config = {"font.family": 'Times New Roman',
-              "font.size": 20,
+    import matplotlib.font_manager as fm
+    available_fonts = fm.findSystemFonts()
+    font_name = 'Times New Roman'
+    if font_name in available_fonts:
+        config = {"font.family": font_name}
+        plt.rcParams.update(config)
+    # 修改字号
+    config = {"font.size": 20,
               "mathtext.fontset": 'cm'}
     plt.rcParams.update(config)
     # 等高线
@@ -239,9 +290,8 @@ def plot(sym: Annotated[str, typer.Option(help="Symmetry of the system")] = "hex
         cbar.outline.set_linewidth(1.5)
         # cbar.set_label("Energy",loc="bottom")
     # 布里渊区
-    外边缘 = 生成六边形()
-    ax.add_patch(外边缘)
-    添加能带路径(ax)
+    添加外边缘(ax, sym=sym)
+    添加能带路径(ax, sym=sym)
     # 数据点
     if dot:
         points_weight = points_df[points_df.weight != 0]
