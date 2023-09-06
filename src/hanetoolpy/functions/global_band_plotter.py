@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+import typer
+from typing_extensions import Annotated
 import math
 import numpy as np
 import pandas as pd
@@ -173,14 +175,15 @@ def draw_dot(ax, xy, text):
                 fontsize=15)
 
 
-def plot(index: str = "VB",
+def plot(sym: Annotated[str, typer.Option(help="体系的对称性")] = "hex",
+         index: Annotated[str, typer.Option(help="VB/CB")] = "VB",
          soc: bool = False,
          axis: bool = False,
          dot: bool = False,
          line: bool = False,
          color: bool = True,
          minus_fermi: bool = True,
-         sym: str = "hex",):
+         save_name: str = "Default"):
     # 读取文件
     eigenval = Eigenval(soc=soc)
     # 获取数据
@@ -270,7 +273,9 @@ def plot(index: str = "VB",
         print(min_point)
     # 显示图片
     # plt.show(block=True)
-    plt.savefig(f"GlobalBand_{index}.png", dpi=600)
+    if save_name == "Default":
+        save_name = f"GlobalBand_{index}"
+    plt.savefig(f"{save_name}.png", dpi=600)
 
 
 if __name__ == '__main__':
