@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import typer
+from typing import Union
 from typing_extensions import Annotated
 import math
 import numpy as np
@@ -7,6 +8,8 @@ import pandas as pd
 
 from matplotlib import pyplot as plt
 from matplotlib.patches import Polygon
+from rich.console import Console
+from rich.table import Table
 
 
 class Eigenval:
@@ -123,7 +126,7 @@ def get_fermi(path="./FERMI_ENERGY"):
 def 添加外边缘(ax, sym):
     length = 1
     if sym == "hex":  # 六角胞
-        point_complex = length * np.sqrt(3) / 3 * np.exp(1j * np.pi * (1./6 + 1./3 * np.arange(7)))
+        point_complex = length * np.sqrt(3) / 3 * np.exp(1j * np.pi * (1. / 6 + 1. / 3 * np.arange(7)))
         points = np.c_[point_complex.real, point_complex.imag]
     elif sym == "rec":  # 矩形胞
         l = 0.5 * length
@@ -142,7 +145,7 @@ def 添加能带路径(ax, sym):
     if sym == "hex":  # 六角胞
         g = (0, 0)
         m = (0.5, 0)
-        k = (0.5, 0.5/3**0.5)
+        k = (0.5, 0.5 / 3 ** 0.5)
         points = [g, m, k]
         # 绘制高对称点字符
         ax.annotate("Γ",
@@ -214,20 +217,33 @@ def draw_dot(ax, xy, text):
                 fontsize=15)
 
 
-def plot(sym: Annotated[str, typer.Option(help="Symmetry of the system")] = "hex",
-         index: Annotated[str, typer.Option(help="VB/CB")] = "VB",
-         soc: bool = False,
-         axis: bool = False,
-         dot: bool = False,
-         line: bool = False,
-         color: bool = True,
-         minus_fermi: bool = True,
-         save_name: str = "Default"):
+def plot(sym: Annotated[str, typer.Option(help="(hex/rec) Symmetry of the system")],
+         index: Annotated[str, typer.Option(help="(Both/VB/CB) The index of the energy band to output")] = "Both",
+         soc: Annotated[bool, typer.Option(help="Whether the SOC is used in the calculation")] = False,
+         axis: Annotated[bool, typer.Option(help="Whether to draw the axis")] = False,
+         dot: Annotated[bool, typer.Option(help="Whether to draw sampling points")] = False,
+         line: Annotated[bool, typer.Option(help="Whether to draw contour lines")] = False,
+         color: Annotated[bool, typer.Option(help="Whether to draw contour color map")] = True,
+         minus_fermi: Annotated[bool, typer.Option(help="Whether to set the Fermi energy to 0")] = True,
+         save_name: Annotated[str, typer.Option(help="The name of the saved file")] = "Auto"):
     """
     plot the band of 2D material.
     """
+    args = locals()
+    console = Console()
+    arg_table = Table(title="Running Parameters")
+    arg_table.add_column("arg")
+    arg_table.add_column("value")
+    for key, value in args.items():
+        arg_table.add_row(str(key), str(value))
+    console.print(arg_table)
+    if index == "Both":
+        plot(sym=sym, index="VB", soc=soc, axis=axis, dot=dot, line=line, color=color, minus_fermi=minus_fermi,
+             save_name=save_name)
+        plot(sym=sym, index="CB", soc=soc, axis=axis, dot=dot, line=line, color=color, minus_fermi=minus_fermi,
+             save_name=save_name)
+        return
     sym = sym.lower()
-    print(sym)
     # 读取文件
     eigenval = Eigenval(soc=soc)
     # 获取数据
@@ -316,19 +332,27 @@ def plot(sym: Annotated[str, typer.Option(help="Symmetry of the system")] = "hex
             linestyle="None",
             markeredgewidth=0.5)
     # 特殊值
+    table = Table()
+    table.add_column("Name")
+    table.add_column("Age")
     if index == "VB":
         draw_dot(ax, max_xy, "VBM")
-        print("The data of VBM:")
-        print(max_point)
+        table.title = "The data of VBM"
+        for key, value in max_point.items():
+            table.add_row(str(key), str(value))
+        console.print(table)
     elif index == "CB":
         draw_dot(ax, min_xy, "CBM")
-        print("The data of CBM:")
-        print(min_point)
+        table.title = "The data of CBM"
+        for key, value in min_point.items():
+            table.add_row(str(key), str(value))
+        console.print(table)
     # 显示图片
     # plt.show(block=True)
-    if save_name == "Default":
+    if save_name == "Auto":
         save_name = f"GlobalBand_{index}"
     plt.savefig(f"{save_name}.png", dpi=600)
+    print(f"The picture was saved to {save_name}.png")
 
 
 if __name__ == '__main__':
