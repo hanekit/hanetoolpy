@@ -5,10 +5,13 @@ import math
 import numpy as np
 import pandas as pd
 
+import matplotlib
 from matplotlib import pyplot as plt
 from matplotlib.patches import Polygon
 from rich.console import Console
 from rich.table import Table
+
+matplotlib.use('Agg')
 
 
 class Eigenval:
