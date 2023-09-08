@@ -5,6 +5,8 @@ import math
 import numpy as np
 import pandas as pd
 
+import logging
+from logging import info
 import matplotlib
 from matplotlib import pyplot as plt
 from matplotlib.patches import Polygon
@@ -12,6 +14,9 @@ from rich.console import Console
 from rich.table import Table
 
 matplotlib.use('Agg')
+logging.basicConfig(level=logging.INFO,
+                    format='[%(asctime)s][%(levelname)-s]: %(message)s',
+                    datefmt='%Y-%m-%d %H:%M:%S')
 
 
 class Eigenval:
@@ -243,10 +248,10 @@ def plot(sym: Annotated[str, typer.Option(help="(hex/rec) Symmetry of the system
     """
     print_args(locals())
     if index == "Both":
-        print("start for VB...")
+        info("Start for VB ...")
         plot(sym=sym, index="VB", soc=soc, axis=axis, dot=dot, line=line, color=color, minus_fermi=minus_fermi,
              save_name=save_name)
-        print("start for CB...")
+        info("Start for CB ...")
         plot(sym=sym, index="CB", soc=soc, axis=axis, dot=dot, line=line, color=color, minus_fermi=minus_fermi,
              save_name=save_name)
         return
@@ -360,7 +365,7 @@ def plot(sym: Annotated[str, typer.Option(help="(hex/rec) Symmetry of the system
     if save_name == "Auto":
         save_name = f"GlobalBand_{index}"
     plt.savefig(f"{save_name}.png", dpi=600)
-    print(f"The picture was saved to {save_name}.png")
+    info(f"The picture was saved to {save_name}.png")
 
 
 if __name__ == '__main__':
