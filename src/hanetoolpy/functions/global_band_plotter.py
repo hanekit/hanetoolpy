@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 import typer
-from typing import Union
 from typing_extensions import Annotated
 import math
 import numpy as np
@@ -217,6 +216,16 @@ def draw_dot(ax, xy, text):
                 fontsize=15)
 
 
+def print_args(args):
+    console = Console()
+    arg_table = Table(title="Running Parameters")
+    arg_table.add_column("arg")
+    arg_table.add_column("value")
+    for key, value in args.items():
+        arg_table.add_row(str(key), str(value))
+    console.print(arg_table)
+
+
 def plot(sym: Annotated[str, typer.Option(help="(hex/rec) Symmetry of the system")],
          index: Annotated[str, typer.Option(help="(Both/VB/CB) The index of the energy band to output")] = "Both",
          soc: Annotated[bool, typer.Option(help="Whether the SOC is used in the calculation")] = False,
@@ -229,17 +238,12 @@ def plot(sym: Annotated[str, typer.Option(help="(hex/rec) Symmetry of the system
     """
     plot the band of 2D material.
     """
-    args = locals()
-    console = Console()
-    arg_table = Table(title="Running Parameters")
-    arg_table.add_column("arg")
-    arg_table.add_column("value")
-    for key, value in args.items():
-        arg_table.add_row(str(key), str(value))
-    console.print(arg_table)
+    print_args(locals())
     if index == "Both":
+        print("start for VB...")
         plot(sym=sym, index="VB", soc=soc, axis=axis, dot=dot, line=line, color=color, minus_fermi=minus_fermi,
              save_name=save_name)
+        print("start for CB...")
         plot(sym=sym, index="CB", soc=soc, axis=axis, dot=dot, line=line, color=color, minus_fermi=minus_fermi,
              save_name=save_name)
         return
@@ -281,7 +285,7 @@ def plot(sym: Annotated[str, typer.Option(help="(hex/rec) Symmetry of the system
     from matplotlib.ticker import MultipleLocator
     ax.xaxis.set_major_locator(MultipleLocator(0.1))
     ax.yaxis.set_major_locator(MultipleLocator(0.1))
-    if axis == False:
+    if axis is False:
         ax.axis('off')  # 关闭数据轴
     cmap = get_colormap()  # 生成色卡
     # 修改字体
@@ -332,9 +336,10 @@ def plot(sym: Annotated[str, typer.Option(help="(hex/rec) Symmetry of the system
             linestyle="None",
             markeredgewidth=0.5)
     # 特殊值
+    console = Console()
     table = Table()
-    table.add_column("Name")
-    table.add_column("Age")
+    table.add_column("Key")
+    table.add_column("Value")
     if index == "VB":
         draw_dot(ax, max_xy, "VBM")
         table.title = "The data of VBM"
