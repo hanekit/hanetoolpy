@@ -16,7 +16,7 @@ app = typer.Typer(context_settings={"help_option_names": ["-h", "--help"]},  # �
 def main(context: typer.Context,
          version: Annotated[bool, typer.Option("--version", "-v", help="show version")] = False):
     """
-    直接运行时执行的函数。
+    TODO: Introduction text.
     """
     if version:  # -version -v 显示程序版本
         print(__version__)
