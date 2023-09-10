@@ -43,7 +43,13 @@ class Eigenval:
         else:
             self.index_VB = int(n_electrons / 2)
         self.index_CB = int(self.index_VB + 1)
-        print(f"VB={self.index_VB}, CB={self.index_CB}")
+        console = Console()
+        table = Table(title="The data of bands")
+        table.add_column("Key")
+        table.add_column("Value")
+        table.add_row("VB_index", str(self.index_VB))
+        table.add_row("CB_index", str(self.index_CB))
+        console.print(table)
         maindata = datalines[header_num:]
         data = []
         for kpoint_index in range(n_kpoints):

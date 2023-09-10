@@ -2,7 +2,8 @@ import typer
 from typing_extensions import Annotated
 
 from hanetoolpy.about import __version__
-from hanetoolpy.functions.global_band_plotter import plot
+from hanetoolpy.functions.vasp_run import vasp_run
+from hanetoolpy.functions.global_band_plotter import plot as f101
 
 
 app = typer.Typer(context_settings={"help_option_names": ["-h", "--help"]},  # 给帮助增加 -h 选项
@@ -23,13 +24,15 @@ def main(context: typer.Context,
         print("use -h for help.")
 
 
-# 添加 vasp 子命令
+# 添加 vasp 命令
 vasp = typer.Typer(no_args_is_help=True,
                    invoke_without_command=True)
 app.add_typer(vasp, name="vasp", help="VASP tools")
 
-# 添加 vasp-f101 子命令
-vasp.command("f101")(plot)
+# 添加 vasp 子命令
+vasp.command("run")(vasp_run)
+vasp.command("f101")(f101)
+
 
 if __name__ == "__main__":
     app()
