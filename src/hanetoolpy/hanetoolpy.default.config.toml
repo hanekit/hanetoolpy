@@ -5,3 +5,5 @@ default_ppn = 2
 [vasp]
 default_vasp_command = "vasp_std"
 # default_vasp_ncore = 1
+
+[pbs]
