@@ -70,7 +70,7 @@ class Eigenval:
             index = self.index_VB
         elif index == "CB":
             index = self.index_CB
-        band_data = self.df[self.df["band_index"] == index - 1]
+        band_data = self.df[self.df["band_index"] == int(index) - 1]
         if not simple:
             return band_data
         else:
@@ -244,9 +244,10 @@ def plot(sym: Annotated[str, typer.Option(help="(hex/rec) Symmetry of the system
          index: Annotated[str, typer.Option(help="(Both/VB/CB) The index of the energy band to output")] = "Both",
          soc: Annotated[bool, typer.Option(help="Whether the SOC is used in the calculation")] = False,
          axis: Annotated[bool, typer.Option(help="Whether to draw the axis")] = False,
+         border: Annotated[bool, typer.Option(help="Whether to draw Brillouin zone border")] = True,
          dot: Annotated[bool, typer.Option(help="Whether to draw sampling points")] = False,
          line: Annotated[bool, typer.Option(help="Whether to draw contour lines")] = False,
-         color: Annotated[bool, typer.Option(help="Whether to draw contour color map")] = True,
+         color: Annotated[str, typer.Option(help="(Default/Depth/None/...) The color map to draw. (\"None\" to skip)")] = "Default",
          minus_fermi: Annotated[bool, typer.Option(help="Whether to set the Fermi energy to 0")] = True,
          save_name: Annotated[str, typer.Option(help="The name of the saved file")] = "Auto"):
     """
@@ -301,7 +302,6 @@ def plot(sym: Annotated[str, typer.Option(help="(hex/rec) Symmetry of the system
     ax.yaxis.set_major_locator(MultipleLocator(0.1))
     if axis is False:
         ax.axis('off')  # 关闭数据轴
-    cmap = get_colormap()  # 生成色卡
     # 修改字体
     import matplotlib.font_manager as fm
     available_fonts = fm.findSystemFonts()
@@ -317,15 +317,22 @@ def plot(sym: Annotated[str, typer.Option(help="(hex/rec) Symmetry of the system
     if line:
         ax.tricontour(x, y, e, linewidths=0.5, colors='k')
     # 颜色映射
-    if color:
+    if color == "Default":
+        cmap = get_colormap()  # 生成色卡
+    elif color == "Depth":
+        cmap = "Greys"
+    else:
+        cmap = color
+    if color != "None":
         data_layer = ax.tricontourf(x, y, e, levels=100, cmap=cmap)
         # 图例
         cbar = fig.colorbar(data_layer)
         cbar.outline.set_linewidth(1.5)
         # cbar.set_label("Energy",loc="bottom")
     # 布里渊区
-    添加外边缘(ax, sym=sym)
-    添加能带路径(ax, sym=sym)
+    if border:
+        添加外边缘(ax, sym=sym)
+        添加能带路径(ax, sym=sym)
     # 数据点
     if dot:
         points_weight = points_df[points_df.weight != 0]
