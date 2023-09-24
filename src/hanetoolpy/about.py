@@ -4,7 +4,7 @@ except ImportError:  # for Python<3.8
     import importlib_metadata as metadata
 
 program_name = "hanetoolpy"
-build_date = "2023.09.18"
+build_date = "2023.09.24"
 
 try:
     __version__ = metadata.version("hanetoolpy")
