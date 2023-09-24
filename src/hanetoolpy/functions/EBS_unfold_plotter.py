@@ -6,8 +6,6 @@ from matplotlib.collections import PatchCollection
 from matplotlib.patches import Rectangle
 from matplotlib.ticker import MultipleLocator
 
-from utils.atoms import read_pband_elements
-from utils.klabels import KlabelData
 
 plt.rcParams["font.family"] = "Times New Roman"
 # plt.rcParams['axes.unicode_minus'] = True
@@ -15,6 +13,45 @@ config = {"font.family": 'Times New Roman',
           "font.size": 8,
           "mathtext.fontset": 'cm'}
 plt.rcParams.update(config)
+
+
+def read_pband_elements(root_dir=None, path: str = "./PBAND_ELEMENTS.dat"):
+    if root_dir is not None:
+        path = os.path.join(root_dir, path)
+    else:
+        path = os.path.abspath(path)
+
+    with open(path, 'r') as file:
+        line = file.readlines()[0]
+    atoms = line.split()[2:]
+    return atoms
+
+
+class KlabelData:
+    """
+    读取 KLABELS.txt 文件，返回 *.labels 和 *.index 列表
+    """
+
+    def __init__(self, root_dir=None, path: str = "./KLABELS.txt"):
+        if root_dir is not None:
+            self.path = os.path.join(root_dir, path)
+        else:
+            self.path = os.path.abspath(path)
+        self.labels = []
+        self.indexs = []
+        self.read()
+
+    def read(self):
+        with open(self.path, 'r') as file:
+            lines = file.readlines()[1:-1]
+        self.labels.clear()
+        self.indexs.clear()
+        for line in lines:
+            if line.strip():  # 如果不是空行
+                klabel, kindex = line.split()
+                klabel = klabel.replace("GAMMA", "Γ")
+                self.labels.append(klabel)
+                self.indexs.append(float(kindex))
 
 
 def read_dat(path: str,
@@ -169,7 +206,7 @@ def main():
     # 创建自定义 colormap
     cmap = LinearSegmentedColormap.from_list(
         'custom_colormap', [(0.0, '#4E64A200'), (1.0, '#4E64A2FF')])
-    fig.colorbar(mpl.cm.ScalarMappable(cmap=cmap), cax=ax)
+    # fig.colorbar(mpl.cm.ScalarMappable(cmap=cmap), cax=ax)
     # 设置轴
     subplots_axis_adjust(ax)
     # 设置边距
@@ -178,11 +215,11 @@ def main():
     # ax.set_facecolor('darkblue')
     # 保存图片为PNG格式
     savepath = os.path.join(root_dir, save_path)
-    # plt.savefig(fname=savepath, dpi=900,
-    # transparent=True
-    # pil_kwargs=dict(optimize=True)
-    #             )
-    plt.show()
+    plt.savefig(fname=savepath, dpi=900,
+                # transparent=True,
+                # pil_kwargs=dict(optimize=True)
+                )
+    # plt.show()
     print("Finish!")
 
 

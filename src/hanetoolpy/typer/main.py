@@ -44,7 +44,7 @@ vasp.command("run")(vasp_run)
 from hanetoolpy.functions.global_band_plotter import plot as f101
 vasp.command("f101")(f101)
 
-from hanetoolpy.functions.global_band_plotter import main as f102
+from hanetoolpy.functions.ebs_unfold_plotter import main as f102
 vasp.command("f102")(f102)
 
 if __name__ == "__main__":
