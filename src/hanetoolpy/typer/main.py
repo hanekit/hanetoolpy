@@ -5,7 +5,7 @@ from rich.logging import RichHandler
 
 from hanetoolpy.about import __version__
 from hanetoolpy.functions.vasp_run import vasp_run
-from hanetoolpy.functions.global_band_plotter import plot as f101
+
 
 app = typer.Typer(context_settings={"help_option_names": ["-h", "--help"]},  # 给帮助增加 -h 选项
                   add_completion=False,  # 去除默认参数选项
@@ -40,7 +40,12 @@ app.add_typer(vasp, name="vasp", help="VASP tools")
 
 # 添加 vasp 子命令
 vasp.command("run")(vasp_run)
+
+from hanetoolpy.functions.global_band_plotter import plot as f101
 vasp.command("f101")(f101)
+
+from hanetoolpy.functions.global_band_plotter import main as f102
+vasp.command("f102")(f102)
 
 if __name__ == "__main__":
     app()
