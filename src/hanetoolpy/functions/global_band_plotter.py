@@ -120,10 +120,14 @@ def rotate(points, angles):
     return new_points
 
 
-def get_colormap():
+def get_colormap(style):
     from matplotlib.colors import LinearSegmentedColormap
-    colors = ['#F8696B', '#FFEB84', '#63BE7B']  # 颜色
-    positions = [0.0, 0.5, 1.0]  # 颜色位置
+    if style == "Excel-RYG":
+        colors = ['#F8696B', '#FFEB84', '#63BE7B']  # 颜色
+        positions = [0.0, 0.5, 1.0]  # 颜色位置
+    elif style == "Depth":
+        colors = ['#000000', '#EEEEEE']  # 颜色
+        positions = [0.0, 1.0]  # 颜色位置
     # 生成色卡
     colormap = LinearSegmentedColormap.from_list('custom_colormap', list(zip(positions, colors)))
     return colormap
@@ -247,7 +251,7 @@ def plot(sym: Annotated[str, typer.Option(help="(hex/rec) Symmetry of the system
          border: Annotated[bool, typer.Option(help="Whether to draw Brillouin zone border")] = True,
          dot: Annotated[bool, typer.Option(help="Whether to draw sampling points")] = False,
          line: Annotated[bool, typer.Option(help="Whether to draw contour lines")] = False,
-         color: Annotated[str, typer.Option(help="(Default/Depth/None/...) The color map to draw. (\"None\" to skip)")] = "Default",
+         color: Annotated[str, typer.Option(help="(Default/depth/none/...) The color map to draw. (\"none\" to skip)")] = "Default",
          minus_fermi: Annotated[bool, typer.Option(help="Whether to set the Fermi energy to 0")] = True,
          save_name: Annotated[str, typer.Option(help="The name of the saved file")] = "Auto"):
     """
@@ -318,12 +322,12 @@ def plot(sym: Annotated[str, typer.Option(help="(hex/rec) Symmetry of the system
         ax.tricontour(x, y, e, linewidths=0.5, colors='k')
     # 颜色映射
     if color == "Default":
-        cmap = get_colormap()  # 生成色卡
-    elif color == "Depth":
-        cmap = "Greys"
+        cmap = get_colormap("Excel-RYG")
+    elif color == "depth":
+        cmap = get_colormap("Depth")
     else:
         cmap = color
-    if color != "None":
+    if color != "none":
         data_layer = ax.tricontourf(x, y, e, levels=100, cmap=cmap)
         # 图例
         cbar = fig.colorbar(data_layer)
