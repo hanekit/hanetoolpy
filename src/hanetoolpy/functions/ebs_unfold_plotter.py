@@ -1,12 +1,12 @@
 import os
-import typer
-from typing_extensions import Annotated
+
 import matplotlib.pyplot as plt
 import pandas as pd
+import typer
 from matplotlib.collections import PatchCollection
 from matplotlib.patches import Rectangle
 from matplotlib.ticker import MultipleLocator
-
+from typing_extensions import Annotated
 
 plt.rcParams["font.family"] = "Times New Roman"
 # plt.rcParams['axes.unicode_minus'] = True
@@ -210,8 +210,9 @@ def main(cbar: Annotated[bool, typer.Option(help="Whether to draw the colorbar")
                                  alpha=w)
     ax.add_collection(collection)
     # 绘制图例
-    from matplotlib.colors import LinearSegmentedColormap
     import matplotlib as mpl
+    from matplotlib.colors import LinearSegmentedColormap
+
     # 创建自定义 colormap
     cmap = LinearSegmentedColormap.from_list(
         'custom_colormap', [(0.0, f'{color}00'), (1.0, f'{color}FF')])

@@ -1,5 +1,6 @@
-import typer
 from typing import Annotated
+
+import typer
 
 
 def vasp_stop(ele: Annotated[bool, typer.Option("--ele", "-e", help="VASP will stop at the next electronic step.")] = False,

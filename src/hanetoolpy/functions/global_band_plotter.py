@@ -1,17 +1,17 @@
 #!/usr/bin/env python
-import typer
-from typing_extensions import Annotated
+import logging
 import math
+from logging import info
+
+import matplotlib
 import numpy as np
 import pandas as pd
-
-import logging
-from logging import info
-import matplotlib
+import typer
 from matplotlib import pyplot as plt
 from matplotlib.patches import Polygon
 from rich.console import Console
 from rich.table import Table
+from typing_extensions import Annotated
 
 matplotlib.use('Agg')
 logging.basicConfig(level=logging.INFO,

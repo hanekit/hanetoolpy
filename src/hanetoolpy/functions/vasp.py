@@ -1,6 +1,8 @@
-from hanetoolpy.cui.options import print_options
-from .global_band_plotter import plot as global_band_plotter
 from functools import partial
+
+from hanetoolpy.cui.options import print_options
+
+from .global_band_plotter import plot as global_band_plotter
 
 sym = "hex"
 
