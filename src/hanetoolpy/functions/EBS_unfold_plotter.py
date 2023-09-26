@@ -1,5 +1,6 @@
 import os
-
+import typer
+from typing_extensions import Annotated
 import matplotlib.pyplot as plt
 import pandas as pd
 from matplotlib.collections import PatchCollection
@@ -144,7 +145,8 @@ def draw_klabel_lines(ax, kindexs):
                    linewidth=0.8, zorder=0)
 
 
-def main():
+def main(cbar: Annotated[bool, typer.Option(help="Whether to draw the colorbar")] = True,
+         color: Annotated[str, typer.Option(help="")] = "#4E64A2"):
     """
     plot the EBS of supercell.
     """
@@ -153,7 +155,14 @@ def main():
                    "EBS.dat",
                    "BAND.dat"]
     # 建立画布
-    fig, ax = plt.subplots(figsize=(3, 3))  # 3 inch = 7.62 cm
+    if cbar:
+        import matplotlib.gridspec as gridspec
+        fig = plt.figure(figsize=(3, 3))
+        gs = gridspec.GridSpec(1, 2, width_ratios=[15, 1])
+        ax = plt.subplot(gs[0])
+        ax_cbar = plt.subplot(gs[1])
+    else:
+        fig, ax = plt.subplots(figsize=(3, 3))  # 3 inch = 7.62 cm
     # 设置数据
     root_dir = R"./"
     save_path = R"EBS-unfold-output.png"
@@ -197,7 +206,7 @@ def main():
     # 绘制散点图
     collection = PatchCollection(rectangles,
                                  # facecolor="yellow",
-                                 facecolor="#4E64A2",
+                                 facecolor=color,
                                  alpha=w)
     ax.add_collection(collection)
     # 绘制图例
@@ -205,12 +214,20 @@ def main():
     import matplotlib as mpl
     # 创建自定义 colormap
     cmap = LinearSegmentedColormap.from_list(
-        'custom_colormap', [(0.0, '#4E64A200'), (1.0, '#4E64A2FF')])
-    # fig.colorbar(mpl.cm.ScalarMappable(cmap=cmap), cax=ax)
+        'custom_colormap', [(0.0, f'{color}00'), (1.0, f'{color}FF')])
     # 设置轴
     subplots_axis_adjust(ax)
     # 设置边距
     subplots_border_adjust(subplot=fig, top=5, left=12, bottom=5)
+    # 绘制 colorbar
+    if cbar:
+        cbar_cmap = LinearSegmentedColormap.from_list(
+            'custom_colormap', [(0.0, '#FFFFFF'), (1.0, color)])
+        cbar = plt.colorbar(plt.cm.ScalarMappable(cmap=cbar_cmap),
+                            cax=ax_cbar, orientation='vertical')
+        subplots_border_adjust(subplot=fig, top=5, left=12, right=5, bottom=5)
+    else:
+        subplots_border_adjust(subplot=fig, top=5, left=12, right=0, bottom=5)
     # 设置背景颜色
     # ax.set_facecolor('darkblue')
     # 保存图片为PNG格式
