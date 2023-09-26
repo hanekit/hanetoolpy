@@ -2,7 +2,9 @@
 # Standard library imports
 from pathlib import Path
 from subprocess import run
+
 # Third-party imports
+
 # Application-specific imports
 from hanetoolpy.jobs.pbsjob import BasePbsJob
 from hanetoolpy.utils.config import get_config
@@ -30,8 +32,7 @@ class BaseVaspJob:
         job.submit()
 
     def track(self):
-        # run(f"tail -f {self.logfile}", shell=True)
-        pass
+        run(f"tail -f {self.logfile}", shell=True)
 
 
 if __name__ == '__main__':
