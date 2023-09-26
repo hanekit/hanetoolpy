@@ -38,7 +38,9 @@ class BasePbsJob:
     stdout: Any = None  # -o
     stderr: Any = None  # -e
     # job args
-    commands: list = field(default_factory=list)  # = []
+    pre_commands: list = field(default_factory=list)  # field(default_factory=list) = []
+    commands: list = field(default_factory=list)
+    post_commands: list = field(default_factory=list)
     file: Any = None
     jobid: Any = None
 
@@ -100,10 +102,11 @@ class BasePbsJob:
         command = " ".join(cmd)
         console.print(Panel(command))
         try:
-            result = run(command, capture_output=True, text=True)
+            result = run(command, shell=True, capture_output=True, text=True)
         except FileNotFoundError as e:
+            print(e)
             error("qsub 命令执行失败")
-        # console.print(result.stdout)
+        console.print(result.stdout)
         # output = result.stdout.strip()
         # if output.startswith("Your job"):
         #     self.jobid = output.split()[2]
