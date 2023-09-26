@@ -38,9 +38,10 @@ class BasePbsJob:
     stdout: Any = None  # -o
     stderr: Any = None  # -e
     # job args
-    pre_commands: list = field(default_factory=list)  # field(default_factory=list) = []
+    # field(default_factory=list) = []
+    pre_commands: list = field(default_factory=lambda: pbs_config.get("pre_commands", []))
     commands: list = field(default_factory=list)
-    post_commands: list = field(default_factory=list)
+    post_commands: list = field(default_factory=lambda: pbs_config.get("post_commands", []))
     file: Any = None
     jobid: Any = None
 
@@ -84,7 +85,8 @@ class BasePbsJob:
             cmd.extend(["-M", self.mail_address])
         temp_path = "temp.pbs"
         table.add_row("file", temp_path)
-        file_content = "\n".join(self.commands)
+        file_commands = self.pre_commands + self.commands + self.post_commands
+        file_content = "\n".join(file_commands)
         from rich.syntax import Syntax
         if len(self.commands) >= 2:
             syntax = Syntax(file_content, "bash", line_numbers=True)
