@@ -9,8 +9,7 @@ description = "test"
 authors = ["hanekit"]
 
 [tool.poetry.scripts]
-hanetoolpy = "hanetoolpy.main:main"
-hntold = "hanetoolpy.main:main"
+hanetoolpy = "hanetoolpy.typer.main:app"
 hnt = "hanetoolpy.typer.main:app"
 
 [tool.poetry.dependencies]
