@@ -24,7 +24,7 @@ logging.basicConfig(level=logging.INFO,
                                           show_path=False)])
 
 current_file_path = Path(__file__).resolve()
-package_root = current_file_path.parent
+package_root = current_file_path.parent.parent
 
 @app.callback(no_args_is_help=True)
 def main(context: typer.Context,
