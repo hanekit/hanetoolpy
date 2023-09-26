@@ -1,3 +1,6 @@
+# Standard library imports
+from pathlib import Path
+
 import typer
 from typing_extensions import Annotated
 import logging
@@ -20,16 +23,22 @@ logging.basicConfig(level=logging.INFO,
                                           show_level=False,
                                           show_path=False)])
 
+current_file_path = Path(__file__).resolve()
+package_root = current_file_path.parent
 
-@app.callback()
+@app.callback(no_args_is_help=True)
 def main(context: typer.Context,
-         version: Annotated[bool, typer.Option("--version", "-v", help="show version")] = False):
+         version: Annotated[bool, typer.Option("--version", "-v", help="show version")] = False,
+         whereis: Annotated[bool, typer.Option("--where", "-w", help="show package path")] = False):
     """
     TODO: Introduction text.
     """
     if version:  # -version -v 显示程序版本
         print(__version__)
-    elif context.invoked_subcommand is None:  # 无子命令时显示帮助
+    elif whereis:
+        print(package_root)
+    elif context.invoked_subcommand is None:
+        # no_args_is_help=False 才会执行
         print("use -h for help.")
 
 

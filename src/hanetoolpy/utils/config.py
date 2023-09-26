@@ -26,7 +26,7 @@ class ConfigLoader:
         custom_config_path = package_root / 'hanetoolpy.custom.config.toml'
         develop_config_path = package_root / 'hanetoolpy.develop.config.toml'
         # 读取默认设置
-        with open(package_root / default_config_path, 'r') as file:
+        with open(default_config_path, 'r') as file:
             default_config = toml.load(file)
             self.config = default_config.copy()
         # 读取自定义设置
