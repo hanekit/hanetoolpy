@@ -11,9 +11,11 @@ config = get_config()
 
 
 class BaseVaspJob:
-    def __init__(self, vasp_command=config["vasp"]["default_vasp_command"]):
+    def __init__(self,
+                 vasp_command=config["vasp"]["default_vasp_command"],
+                 ppn=config["mpi"]["default_ppn"]):
         self.vasp_command = vasp_command
-        self.ppn = 8
+        self.ppn = ppn
         self.logfile = "vasp.log"
 
     def submit(self):

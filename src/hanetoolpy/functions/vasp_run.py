@@ -11,5 +11,7 @@ def vasp_run(command: str = "vasp.x_std",
     """
     print_args(locals())
     job = BaseVaspJob()
+    job.vasp_command =command
+    job.ppn = ppn
     job.submit()
     job.track()
