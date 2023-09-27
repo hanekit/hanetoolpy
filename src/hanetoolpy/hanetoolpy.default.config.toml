@@ -1,9 +1,13 @@
+# You should NOT DELETE or MODIFY this file !
+# Do your own settings in hanetoolpy.custom.config.toml
+
 [mpi]
 default_mpi_command = "mpirun"
 default_ppn = 2
 
 [vasp]
 default_vasp_command = "vasp_std"
-# default_vasp_ncore = 1
+default_vasp_ncore = 1
+default_vasp_logfile = "vasp.log"
 
 [pbs]
