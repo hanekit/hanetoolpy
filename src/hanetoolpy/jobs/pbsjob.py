@@ -12,9 +12,11 @@ from rich.panel import Panel
 
 # Application-specific imports
 from hanetoolpy.utils.config import get_config
+from hanetoolpy.cui.confirm import confirm
 
 config = get_config()
 pbs_config = config["pbs"]
+
 
 @dataclass
 class BasePbsJob:
@@ -103,12 +105,16 @@ class BasePbsJob:
         console.print("The following command will be executed:")
         command = " ".join(cmd)
         console.print(Panel(command))
-        try:
-            result = run(command, shell=True, capture_output=True, text=True)
-        except FileNotFoundError as e:
-            print(e)
-            error("qsub 命令执行失败")
-        console.print(result.stdout)
+        confirm_run = confirm("Confirm to submit this job?", default=True)
+        if confirm_run:
+            try:
+                result = run(command, shell=True, capture_output=True, text=True)
+            except FileNotFoundError as e:
+                print(e)
+                error("qsub 命令执行失败")
+            console.print(result.stdout)
+        else:
+            exit()
         # output = result.stdout.strip()
         # if output.startswith("Your job"):
         #     self.jobid = output.split()[2]
