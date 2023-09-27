@@ -1,4 +1,6 @@
 # Standard library imports
+from hanetoolpy.functions.ebs_unfold_plotter import main as f102
+from hanetoolpy.functions.global_band_plotter import plot as f101
 from pathlib import Path
 
 import typer
@@ -27,6 +29,7 @@ logging.basicConfig(level=logging.INFO,
 current_file_path = Path(__file__).resolve()
 package_root = current_file_path.parent.parent
 
+
 @app.callback(no_args_is_help=True)
 def main(context: typer.Context,
          version: Annotated[bool, typer.Option("--version", "-v", help="show version")] = False,
@@ -52,11 +55,19 @@ app.add_typer(vasp, name="vasp", help="VASP tools")
 vasp.command("run")(vasp_run)
 vasp.command("stop", no_args_is_help=True)(vasp_stop)
 
-from hanetoolpy.functions.global_band_plotter import plot as f101
 vasp.command("f101")(f101)
 
-from hanetoolpy.functions.ebs_unfold_plotter import main as f102
 vasp.command("f102")(f102)
+
+# 添加 vaspkit 命令
+vaspkit = typer.Typer(no_args_is_help=True,
+                      invoke_without_command=True)
+app.add_typer(vaspkit, name="vaspkit", help="VASPKIT tools")
+
+# 添加 vaspkit 子命令
+from hanetoolpy.functions.vaspkit import vaspkit_281
+vaspkit.command("f281")(vaspkit_281)
+
 
 if __name__ == "__main__":
     app()
