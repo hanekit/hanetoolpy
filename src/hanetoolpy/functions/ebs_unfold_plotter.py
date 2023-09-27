@@ -8,6 +8,8 @@ from matplotlib.patches import Rectangle
 from matplotlib.ticker import MultipleLocator
 from typing_extensions import Annotated
 
+from hanetoolpy.utils.check_files import check_files
+
 plt.rcParams["font.family"] = "Times New Roman"
 # plt.rcParams['axes.unicode_minus'] = True
 config = {"font.family": 'Times New Roman',
@@ -154,6 +156,7 @@ def main(cbar: Annotated[bool, typer.Option(help="Whether to draw the colorbar")
     input_files = ["BAND_KLABELS.txt",
                    "EBS.dat",
                    "BAND.dat"]
+    check_files(input_files)
     # 建立画布
     if cbar:
         import matplotlib.gridspec as gridspec
