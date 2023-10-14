@@ -10,10 +10,14 @@ from typing_extensions import Annotated
 
 from hanetoolpy.utils.check_files import check_files
 
-plt.rcParams["font.family"] = "Times New Roman"
+# 修改字体
+import matplotlib.font_manager as fm
+available_fonts = fm.findSystemFonts()
+font_name = 'Times New Roman'
+if font_name in available_fonts:
+    plt.rcParams["font.family"] = font_name
 # plt.rcParams['axes.unicode_minus'] = True
-config = {"font.family": 'Times New Roman',
-          "font.size": 8,
+config = {"font.size": 8,
           "mathtext.fontset": 'cm'}
 plt.rcParams.update(config)
 

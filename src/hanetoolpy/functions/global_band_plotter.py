@@ -311,8 +311,7 @@ def plot(sym: Annotated[str, typer.Option(help="(hex/rec) Symmetry of the system
     available_fonts = fm.findSystemFonts()
     font_name = 'Times New Roman'
     if font_name in available_fonts:
-        config = {"font.family": font_name}
-        plt.rcParams.update(config)
+        plt.rcParams["font.family"] = font_name
     # 修改字号
     config = {"font.size": 20,
               "mathtext.fontset": 'cm'}
