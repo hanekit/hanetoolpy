@@ -14,3 +14,10 @@ except metadata.PackageNotFoundError:
 version_text = f"version {__version__}"
 build_text = f"build {build_date}"
 full_version = f"{program_name} | {version_text} ({build_text})"
+
+from pathlib import Path
+current_file_path = Path(__file__).resolve()
+package_root = current_file_path.parent
+external_package_path = package_root / "external"
+
+print(external_package_path)
