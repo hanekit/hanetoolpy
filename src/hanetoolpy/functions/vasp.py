@@ -15,12 +15,12 @@ def is_vasp_end(path="./"):
     """
     path = Path(path).resolve()
     outcar_path = path / "OUTCAR"
-    try:
-        with open(outcar_path, 'r') as f:
+    if outcar_path.exists():
+        with outcar_path.open('r') as f:
             content = f.read()
             if "Total CPU time used" in content:
                 return True
             else:
-                return False
-    except FileNotFoundError:
+                return "Running"
+    else:
         return False
