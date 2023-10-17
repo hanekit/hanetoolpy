@@ -1,18 +1,26 @@
-from functools import partial
+from pathlib import Path
+import logging
 
-from hanetoolpy.cui.options import print_options
+def check_vasp_end(path="./"):
+    path = Path(path).resolve()
+    result = is_vasp_end(path)
+    if result:
+        logging.info(f"[v] {path} finished.")
+    else:
+        logging.info(f"[x] {path} unfinished.")
 
-from .global_band_plotter import plot as global_band_plotter
-
-sym = "hex"
-
-vasp_option_dic = {
-    "1": {"name": "Plot Global Band (VB)", "function": partial(global_band_plotter, index="VB", sym=sym)},
-    "2": {"name": "Plot Global Band (CB)", "function": partial(global_band_plotter, index="CB", sym=sym)},
-    "3": {"name": "Plot Global Band (VB) (SOC)", "function": partial(global_band_plotter, index="VB", sym=sym, soc=True)},
-    "4": {"name": "Plot Global Band (CB) (SOC)", "function": partial(global_band_plotter, index="CB", sym=sym, soc=True)},
-}
-
-
-def vasp():
-    print_options(vasp_option_dic)
+def is_vasp_end(path="./"):
+    """
+    Check if the VASP job is finished.
+    """
+    path = Path(path).resolve()
+    outcar_path = path / "OUTCAR"
+    try:
+        with open(outcar_path, 'r') as f:
+            content = f.read()
+            if "Total CPU time used" in content:
+                return True
+            else:
+                return False
+    except FileNotFoundError:
+        return False
