@@ -39,3 +39,12 @@ def add_commands(parent):
     from hanetoolpy.functions.thirdorder import \
         check_thirdorder_jobs as thirdorder_f102
     thirdorder.command("f102")(thirdorder_f102)
+
+    # phonopy
+    phonopy = typer.Typer(no_args_is_help=True,
+                          invoke_without_command=True)
+    parent.add_typer(phonopy, name="phonopy", help="phonopy tools")
+
+    # phonopy 子命令
+    from hanetoolpy.functions.rms import main as rms
+    phonopy.command("rms")(rms)

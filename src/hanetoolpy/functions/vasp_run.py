@@ -9,7 +9,7 @@ def vasp_run(command: str = config["vasp"]["default_vasp_command"],
              mpi: str = config["mpi"]["default_mpi_command"],
              logfile: str = config["vasp"]["default_vasp_logfile"]):
     """
-    运行一个 vasp 程序
+    Run a VASP job.
     """
     print_args(locals())
     job = BaseVaspJob()

@@ -21,7 +21,7 @@ logging.basicConfig(level=logging.INFO,
                                           show_time=False,
                                           show_level=False,
                                           show_path=False)])
-logging.info("hanetoolpy start...")
+# logging.info("hanetoolpy start...")
 
 current_file_path = Path(__file__).resolve()
 package_root = current_file_path.parent.parent
