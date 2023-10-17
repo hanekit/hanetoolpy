@@ -44,7 +44,7 @@ def main(
     run(command, shell=True)
 
 
-def check_thirdorder_jobs(path="./", gap:int=10):
+def check_thirdorder_jobs(path="./", gap:int=50):
     """
     check_thirdorder_jobs
     """
@@ -52,6 +52,9 @@ def check_thirdorder_jobs(path="./", gap:int=10):
     path = Path(path).resolve()
     job_paths_pattern = str(path / "job-*")
     job_paths = sorted(glob.glob(job_paths_pattern))
+    if len(job_paths) == 0:
+        logging.warning("No job-* found, program exit.")
+        exit()
     status = []
     for job_path in job_paths:
         state = is_vasp_end(job_path)
@@ -80,7 +83,7 @@ def check_thirdorder_jobs(path="./", gap:int=10):
         for i in range(0, last_job_num, gap):
             start_index = i
             end_index = min(i + gap, last_job_num)
-            line = f"{start_index:03} {text[start_index:end_index]} {end_index:03}"
+            line = f"{start_index+1:03} {text[start_index:end_index]} {end_index:03}"
             result.append(line)
         return '\n'.join(result)
 
@@ -90,3 +93,5 @@ def check_thirdorder_jobs(path="./", gap:int=10):
     print("Detailed Progresses")
     print(format(status_text))
 
+if __name__ == '__main__':
+    check_thirdorder_jobs()
