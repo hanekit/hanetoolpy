@@ -5,9 +5,9 @@ import numpy as np
 import pandas as pd
 
 
-tensor = ['xx', 'xy', 'xz',
-          'yx', 'yy', 'yz',
-          'zx', 'zy', 'zz']
+tensor = ["xx", "xy", "xz",
+          "yx", "yy", "yz",
+          "zx", "zy", "zz"]
 
 
 def get_distance(structure, atom_a, atom_b):
@@ -32,23 +32,23 @@ def get_distance(structure, atom_a, atom_b):
     return distance
 
 
-def read_force_constants(path='FORCE_CONSTANTS'):
+def read_force_constants(path="FORCE_CONSTANTS"):
     # 读取文件
-    with open(path, 'r') as file:
+    with open(path, "r") as file:
         lines = file.readlines()
     # 去除首行，后每 4 行为一组
     data_groups = [" ".join(lines[i:i+4]) for i in range(1, len(lines), 4)]
     # 分列每组数据，得到二维列表
     data_list = [i.split() for i in data_groups]
     # 创建 DataFrame
-    columns = ['atom_a', 'atom_b'] + tensor
+    columns = ["atom_a", "atom_b"] + tensor
     df = pd.DataFrame(data_list, columns=columns)
     return df
 
 
 def plot_rms(df):
-    x = df['distance']
-    y = df['rms']
+    x = df["distance"]
+    y = df["rms"]
     plt.scatter(x, y)
     return plt
 
@@ -67,20 +67,23 @@ def main():
     | rms.png
     """
     # 读取文件
-    logging.info("(1/4) reading FORCE_CONSTANTS ...")
+    logging.info("(1/4) Reading FORCE_CONSTANTS ...")
     df = read_force_constants()
     # 计算 RMS
     logging.info("(2/4) Calculating RMS ...")
-    df['rms'] = (df[tensor].apply(lambda row: row.astype(float).pow(2)).sum(axis=1) / 9) ** 0.5
+    df["rms"] = (df[tensor].apply(lambda row: row.astype(float).pow(2)).sum(axis=1) / 9) ** 0.5
     # 计算距离
     logging.info("(3/4) Calculating atom distance ...")
     from pymatgen.core import Structure
     structure = Structure.from_file("SPOSCAR")
-    df['distance'] = df.apply(lambda row: get_distance(structure, row['atom_a'], row['atom_b']), axis=1)
+    df["distance"] = df.apply(lambda row: get_distance(structure, row["atom_a"], row["atom_b"]), axis=1)
     # 输出结果
     logging.info("(4/4) Output the results ...")
-    df[['distance', 'rms']].to_csv("rms.csv")
+    df[["distance", "rms","atom_a","atom_b"]].to_csv("rms.csv", index=False)
     plot_rms(df)
     plt.savefig("rms.png")
     # 结束
     logging.info("Finish!")
+
+if __name__ == '__main__':
+    main()
