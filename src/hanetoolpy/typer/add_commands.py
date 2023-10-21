@@ -39,6 +39,9 @@ def add_commands(parent):
     from hanetoolpy.functions.thirdorder import \
         check_thirdorder_jobs as thirdorder_f102
     thirdorder.command("f102")(thirdorder_f102)
+    from hanetoolpy.functions.thirdorder import \
+        organize_files as thirdorder_f103
+    thirdorder.command("f103")(thirdorder_f103)
 
     # phonopy
     phonopy = typer.Typer(no_args_is_help=True,

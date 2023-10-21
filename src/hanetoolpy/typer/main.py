@@ -29,8 +29,8 @@ package_root = current_file_path.parent.parent
 
 @app.callback(no_args_is_help=True)
 def main(context: typer.Context,
-         version: Annotated[bool, typer.Option("--version", "-v", help="show version")] = False,
-         whereis: Annotated[bool, typer.Option("--where", "-w", help="show package path")] = False):
+         version: Annotated[bool, typer.Option("--version", "-v", help="Show the version.")] = False,
+         whereis: Annotated[bool, typer.Option("--where", "-w", help="Show the package path.")] = False):
     """
     TODO: Introduction text.
     """

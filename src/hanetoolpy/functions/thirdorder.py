@@ -1,5 +1,6 @@
 import glob
 import logging
+import shutil
 from pathlib import Path
 from subprocess import run
 from typing import Tuple
@@ -44,7 +45,7 @@ def main(
     run(command, shell=True)
 
 
-def check_thirdorder_jobs(path="./", gap:int=50):
+def check_thirdorder_jobs(path="./", gap: int = 50):
     """
     check_thirdorder_jobs
     """
@@ -89,9 +90,48 @@ def check_thirdorder_jobs(path="./", gap:int=50):
 
     print(path)
     print("Total Progress")
-    print(progress_bar(status_count["finished"],len(status_text)))
+    print(progress_bar(status_count["finished"], len(status_text)))
     print("Detailed Progresses")
     print(format(status_text))
 
+
+def organize_files(
+    poscar_dir: Annotated[str, typer.Argument(help="Directory containing config files")] = './',
+    jobs_dir: Annotated[str, typer.Option(help="(hex/rec) Symmetry of the system")] = "./jobs",
+    incar_path: Annotated[str, typer.Argument(help="Path to INCAR file")] = 'INCAR',
+    kpoints_path: Annotated[str, typer.Argument(help="Path to KPOINTS file")] = 'KPOINTS',
+    potcar_path: Annotated[str, typer.Argument(help="Path to POTCAR file")] = 'POTCAR',
+    method: Annotated[str, typer.Option(help="Method for organizing files: 'softlink' or 'copy'")] = 'softlink',
+):
+    poscar_dir = Path(poscar_dir).resolve()
+    jobs_dir = Path(jobs_dir).resolve()
+    jobs_dir.mkdir(exist_ok=True)
+    input_files = {
+        "INCAR": incar_path,
+        "KPOINTS": kpoints_path,
+        "POTCAR": potcar_path,
+    }
+    for key, path in input_files.items():
+        input_files[key] = Path(path).resolve()
+
+    for poscar in glob.glob(str(poscar_dir / '3RD.POSCAR.*')):
+        job_number = poscar.split('.')[-1]
+        job_dir = jobs_dir / f'job-{job_number}'
+        job_dir.mkdir(exist_ok=True)
+        shutil.move(poscar, job_dir / 'POSCAR')
+
+        for file_name, file_source in input_files.items():
+            file_destination = job_dir / file_name
+            if method[0].lower() == 's':  # for softlink
+                file_destination.symlink_to(file_source)
+                logging.info(str(file_source)+"\tlink to\t"+ str(file_destination))
+            elif method[0].lower() == 'c':  # for copy
+                shutil.copy(file_source, file_destination)
+                logging.info(str(file_source)+"\tcopy to\t"+ str(file_destination))
+            else:
+                logging.error(f'Unsupported method: {method}')
+            # info(f'Created {method} file for {config_file} in {job_dir}')
+
+
 if __name__ == '__main__':
-    check_thirdorder_jobs()
+    organize_files()
