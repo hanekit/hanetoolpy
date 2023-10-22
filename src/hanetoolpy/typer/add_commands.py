@@ -34,13 +34,13 @@ def add_commands(parent):
     parent.add_typer(thirdorder, name="thirdorder", help="thirdorder tools")
 
     # 添加 thirdorder 子命令
-    from hanetoolpy.functions.thirdorder_vasp_repackage import sow, reap
-    thirdorder.command("sow")(sow)
-    thirdorder.command("reap")(reap)
-
-    from hanetoolpy.functions.thirdorder \
-        import main as thirdorder_f101
-    thirdorder.command("f101")(thirdorder_f101)
+    try:
+        from hanetoolpy.functions.thirdorder_vasp_repackage import sow, reap
+    except ModuleNotFoundError as e:
+        from hanetoolpy.functions.thirdorder_repost import sow, reap
+    finally:
+        thirdorder.command("sow")(sow)
+        thirdorder.command("reap")(reap)
 
     from hanetoolpy.functions.thirdorder \
         import check_thirdorder_jobs as thirdorder_f102
