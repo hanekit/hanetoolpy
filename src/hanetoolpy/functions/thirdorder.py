@@ -103,6 +103,9 @@ def organize_files(
     potcar_path: Annotated[str, typer.Argument(help="Path to POTCAR file")] = 'POTCAR',
     method: Annotated[str, typer.Option(help="Method for organizing files: 'softlink' or 'copy'")] = 'softlink',
 ):
+    """
+    sort the 3RD.POSCAR.* and INCAR KPOINTS POTCAR to job-* folders.
+    """
     poscar_dir = Path(poscar_dir).resolve()
     jobs_dir = Path(jobs_dir).resolve()
     jobs_dir.mkdir(exist_ok=True)
@@ -124,14 +127,50 @@ def organize_files(
             file_destination = job_dir / file_name
             if method[0].lower() == 's':  # for softlink
                 file_destination.symlink_to(file_source)
-                logging.info(str(file_source)+"\tlink to\t"+ str(file_destination))
+                logging.info(str(file_source)+"\tlink to\t" + str(file_destination))
             elif method[0].lower() == 'c':  # for copy
                 shutil.copy(file_source, file_destination)
-                logging.info(str(file_source)+"\tcopy to\t"+ str(file_destination))
+                logging.info(str(file_source)+"\tcopy to\t" + str(file_destination))
             else:
                 logging.error(f'Unsupported method: {method}')
             # info(f'Created {method} file for {config_file} in {job_dir}')
 
 
+def read_header(file_path):
+    with open(file_path, 'r') as file:
+        return file.readline().strip()
+
+
+def check_duplicates(path):
+    """
+    check duplicate jobs and write SKIP.log
+    """
+    work_path = Path(path).resolve()
+    jobs = sorted([job for job in list(work_path.glob('job-*')) if job.is_dir()])
+    headers = [read_header(job / "POSCAR") for job in jobs]
+
+    for job, header in zip(jobs, headers):
+        first_job = jobs[headers.index(header)]
+        if job != first_job:
+            print(f"{job.name} = {first_job.name}")
+            (job / "vasprun.xml").unlink()
+            (job / "vasprun.xml").symlink_to(first_job / "vasprun.xml")
+            with open(job / "SKIP.log", 'w') as file:
+                file.write(f"{job.name} = {first_job.name}")
+
+def recutoff(old_work_path, new_work_path):
+    old_work_path = Path(old_work_path).resolve()
+    new_work_path = Path(new_work_path).resolve()
+    old_jobs = sorted([job for job in list(old_work_path.glob('job-*')) if job.is_dir()])
+    new_jobs = sorted([job for job in list(new_work_path.glob('job-*')) if job.is_dir()])
+    old_headers = [read_header(job / "POSCAR") for job in old_jobs]
+    new_headers = [read_header(job / "POSCAR") for job in new_jobs]
+
+    for new_job, new_header in zip(new_jobs, new_headers):
+        if new_header in old_headers:
+            old_job = old_jobs[old_headers.index(new_header)]
+            print(f"new-{new_job.name} = old-{old_job.name}")
+
+
 if __name__ == '__main__':
-    organize_files()
+    check_duplicates("./jobs")

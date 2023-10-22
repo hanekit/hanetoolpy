@@ -34,14 +34,25 @@ def add_commands(parent):
     parent.add_typer(thirdorder, name="thirdorder", help="thirdorder tools")
 
     # 添加 thirdorder 子命令
-    from hanetoolpy.functions.thirdorder import main as thirdorder_f101
+    from hanetoolpy.functions.thirdorder_vasp_repackage import sow, reap
+    thirdorder.command("sow")(sow)
+    thirdorder.command("reap")(reap)
+
+    from hanetoolpy.functions.thirdorder \
+        import main as thirdorder_f101
     thirdorder.command("f101")(thirdorder_f101)
-    from hanetoolpy.functions.thirdorder import \
-        check_thirdorder_jobs as thirdorder_f102
+
+    from hanetoolpy.functions.thirdorder \
+        import check_thirdorder_jobs as thirdorder_f102
     thirdorder.command("f102")(thirdorder_f102)
-    from hanetoolpy.functions.thirdorder import \
-        organize_files as thirdorder_f103
+
+    from hanetoolpy.functions.thirdorder \
+        import organize_files as thirdorder_f103
     thirdorder.command("f103")(thirdorder_f103)
+
+    from hanetoolpy.functions.thirdorder \
+        import check_duplicates as thirdorder_f104
+    thirdorder.command("f104")(thirdorder_f104)
 
     # phonopy
     phonopy = typer.Typer(no_args_is_help=True,
