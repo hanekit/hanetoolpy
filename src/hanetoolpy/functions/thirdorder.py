@@ -45,14 +45,15 @@ def main(
     run(command, shell=True)
 
 
-def check_thirdorder_jobs(path="./", gap: int = 50):
+def check_thirdorder_jobs(path: str = "./",
+                          gap: int = 50,
+                          skipfile: str = "SKIP.log"):
     """
     check_thirdorder_jobs
     """
     from hanetoolpy.functions.vasp import is_vasp_end
     path = Path(path).resolve()
-    job_paths_pattern = str(path / "job-*")
-    job_paths = sorted(glob.glob(job_paths_pattern))
+    job_paths = sorted(path.glob("job-*"))
     if len(job_paths) == 0:
         logging.warning("No job-* found, program exit.")
         exit()
@@ -61,6 +62,8 @@ def check_thirdorder_jobs(path="./", gap: int = 50):
         state = is_vasp_end(job_path)
         if state == True:
             status.append("#")
+        elif (job_path / skipfile).exists():
+            status.append("S")
         elif state == "Running":
             status.append("R")
         else:
@@ -141,7 +144,7 @@ def read_header(file_path):
         return file.readline().strip()
 
 
-def check_duplicates(path):
+def check_duplicates(path="./", link: bool = True, skipfile="SKIP.log"):
     """
     check duplicate jobs and write SKIP.log
     """
@@ -152,11 +155,20 @@ def check_duplicates(path):
     for job, header in zip(jobs, headers):
         first_job = jobs[headers.index(header)]
         if job != first_job:
-            print(f"{job.name} = {first_job.name}")
-            (job / "vasprun.xml").unlink()
-            (job / "vasprun.xml").symlink_to(first_job / "vasprun.xml")
-            with open(job / "SKIP.log", 'w') as file:
+            logging.info(f"{job.name} = {first_job.name}")
+            xml_path = job / "vasprun.xml"
+            if link:
+                if xml_path.is_symlink():
+                    xml_path.unlink()
+                    logging.info(f"link {xml_path} found, unlinked")
+                elif xml_path.is_file():
+                    xml_path.rename(xml_path.parent / "vasprun.xml.bak")
+                    logging.info(f"file {xml_path} found, renamed it to vasprun.xml.bak")
+                xml_path.symlink_to(first_job / "vasprun.xml")
+                logging.info(f"link {xml_path} created")
+            with open(job / skipfile, 'w') as file:
                 file.write(f"{job.name} = {first_job.name}")
+
 
 def recutoff(old_work_path, new_work_path):
     old_work_path = Path(old_work_path).resolve()
