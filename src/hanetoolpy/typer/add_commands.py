@@ -39,20 +39,20 @@ def add_commands(parent):
     except ModuleNotFoundError as e:
         from hanetoolpy.functions.thirdorder_repost import sow, reap
     finally:
-        thirdorder.command("sow")(sow)
-        thirdorder.command("reap")(reap)
+        thirdorder.command("sow", rich_help_panel="Main")(sow)
+        thirdorder.command("reap", rich_help_panel="Main")(reap)
 
     from hanetoolpy.functions.thirdorder \
-        import check_thirdorder_jobs as thirdorder_f102
+        import check_thirdorder_jobs as thirdorder_f101
+    thirdorder.command("f101")(thirdorder_f101)
+
+    from hanetoolpy.functions.thirdorder \
+        import organize_files as thirdorder_f102
     thirdorder.command("f102")(thirdorder_f102)
 
     from hanetoolpy.functions.thirdorder \
-        import organize_files as thirdorder_f103
+        import check_duplicates as thirdorder_f103
     thirdorder.command("f103")(thirdorder_f103)
-
-    from hanetoolpy.functions.thirdorder \
-        import check_duplicates as thirdorder_f104
-    thirdorder.command("f104")(thirdorder_f104)
 
     # phonopy
     phonopy = typer.Typer(no_args_is_help=True,

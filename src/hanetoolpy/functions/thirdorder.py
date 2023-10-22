@@ -11,7 +11,7 @@ def check_thirdorder_jobs(path: str = "./",
                           gap: int = 50,
                           skipfile: str = "SKIP.log"):
     """
-    check_thirdorder_jobs
+    Check the status of jobs.
     """
     from hanetoolpy.functions.vasp import is_vasp_end
     path = Path(path).resolve()
@@ -61,15 +61,26 @@ def check_thirdorder_jobs(path: str = "./",
 
 
 def organize_files(
-    poscar_dir: Annotated[str, typer.Argument(help="Directory containing config files")] = './',
-    jobs_dir: Annotated[str, typer.Option(help="(hex/rec) Symmetry of the system")] = "./jobs",
-    incar_path: Annotated[str, typer.Argument(help="Path to INCAR file")] = 'INCAR',
-    kpoints_path: Annotated[str, typer.Argument(help="Path to KPOINTS file")] = 'KPOINTS',
-    potcar_path: Annotated[str, typer.Argument(help="Path to POTCAR file")] = 'POTCAR',
-    method: Annotated[str, typer.Option(help="Method for organizing files: 'softlink' or 'copy'")] = 'softlink',
+    poscar_dir: Annotated[str, typer.Option(
+        help="Directory containing 3RD.POSCAR.* files.",
+        metavar="PATH")] = './',
+    jobs_dir: Annotated[str, typer.Option(
+        "--workdir", help="Directory to run jobs.",
+        metavar="PATH")] = "./jobs",
+    incar_path: Annotated[str, typer.Option(
+        "--incar", help="Path to INCAR file.",
+        metavar="PATH", rich_help_panel="Input files")] = './INCAR',
+    kpoints_path: Annotated[str, typer.Option(
+        "--kpoints", help="Path to KPOINTS file.",
+        metavar="PATH", rich_help_panel="Input files")] = './KPOINTS',
+    potcar_path: Annotated[str, typer.Option(
+        "--potcar", help="Path to POTCAR file.",
+        metavar="PATH", rich_help_panel="Input files")] = './POTCAR',
+    method: Annotated[str, typer.Option(
+        help="(softlink/copy) Method for organizing files.")] = 'softlink',
 ):
     """
-    sort the 3RD.POSCAR.* and INCAR KPOINTS POTCAR to job-* folders.
+    Move the 3RD.POSCAR.* to job-* folders with INCAR KPOINTS POTCAR files.
     """
     poscar_dir = Path(poscar_dir).resolve()
     jobs_dir = Path(jobs_dir).resolve()
@@ -108,7 +119,7 @@ def read_header(file_path):
 
 def check_duplicates(path="./", link: bool = True, skipfile="SKIP.log"):
     """
-    check duplicate jobs and write SKIP.log
+    Find duplicate jobs and write SKIP.log.
     """
     work_path = Path(path).resolve()
     jobs = sorted([job for job in list(work_path.glob('job-*')) if job.is_dir()])
