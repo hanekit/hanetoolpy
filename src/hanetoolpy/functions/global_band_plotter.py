@@ -132,12 +132,27 @@ def get_colormap(style):
     colormap = LinearSegmentedColormap.from_list('custom_colormap', list(zip(positions, colors)))
     return colormap
 
-
-def get_fermi(path="./FERMI_ENERGY"):
+def get_fermi_by_vaspkit(path="./FERMI_ENERGY"):
+    """
+    备用方法，暂未使用。
+    """
     with open(path, "r") as file:
         dataline = file.readlines()
         fermi = float(dataline[1].split()[0])
     return fermi
+
+def get_fermi(outcar="./OUTCAR"):
+    key_text = "E-fermi"
+    with open(outcar, 'r') as file:
+        lines = file.readlines()
+    for line_number, line in enumerate(lines, start=1):
+        if key_text in line:
+            # info("Find \"E-fermi\" line:")
+            # text = f"{line_number} |" + line.replace("\n", "")
+            # print(Panel(text, title=outcar))
+            e_fermi = float(line.split()[2])
+    info(f"Get Fermi energy: {e_fermi} eV")
+    return e_fermi
 
 
 def 添加外边缘(ax, sym):
