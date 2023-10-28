@@ -7,6 +7,7 @@ import matplotlib
 import numpy as np
 import pandas as pd
 import typer
+from hanetool.utils.vasp.eigenval import Eigenval
 from matplotlib import pyplot as plt
 from matplotlib.patches import Polygon
 from rich.console import Console
@@ -17,64 +18,6 @@ matplotlib.use('Agg')
 logging.basicConfig(level=logging.INFO,
                     format='[%(asctime)s][%(levelname)-s]: %(message)s',
                     datefmt='%Y-%m-%d %H:%M:%S')
-
-
-class Eigenval:
-    def __init__(self, path="./EIGENVAL", soc=False):
-        self.path = path
-        self.index_VB = None
-        self.index_CB = None
-        self.df = None
-        self.soc = soc
-        self.read()
-        pass
-
-    def read(self):
-        header_num = 7
-        with open(self.path, "r") as file:
-            datalines = file.read().splitlines()
-        band_info = datalines[5].split()
-        n_electrons = int(band_info[0])
-        n_kpoints = int(band_info[1])
-        n_bands = int(band_info[2])
-        n_loop = n_bands + 2
-        if self.soc:
-            self.index_VB = int(n_electrons)
-        else:
-            self.index_VB = int(n_electrons / 2)
-        self.index_CB = int(self.index_VB + 1)
-        console = Console()
-        table = Table(title="The data of bands")
-        table.add_column("Key")
-        table.add_column("Value")
-        table.add_row("VB_index", str(self.index_VB))
-        table.add_row("CB_index", str(self.index_CB))
-        console.print(table)
-        maindata = datalines[header_num:]
-        data = []
-        for kpoint_index in range(n_kpoints):
-            kpoint_line_index = kpoint_index * n_loop
-            kpoint_data = [float(string) for string in maindata[kpoint_line_index].split()]
-            k_a, k_b, k_c = kpoint_data[:3]
-            weight = kpoint_data[3]
-            for band_index in range(n_bands):  # 从 0 开始
-                band_line_index = kpoint_line_index + 1 + band_index
-                energy = [float(string) for string in maindata[band_line_index].split()][1]
-                data.append([k_a, k_b, k_c, weight, band_index, energy])
-        self.df = pd.DataFrame(
-            data, columns=["k_a", "k_b", "k_c", "weight", "band_index", "energy"])
-        self.df['band_index'] = self.df['band_index'].astype(int)
-
-    def get_band(self, index, simple=False):
-        if index == "VB":
-            index = self.index_VB
-        elif index == "CB":
-            index = self.index_CB
-        band_data = self.df[self.df["band_index"] == int(index) - 1]
-        if not simple:
-            return band_data
-        else:
-            return band_data.loc[:, ["k_a", "k_b", "energy"]]
 
 
 def rotate_xy(xy, angle):
@@ -132,6 +75,7 @@ def get_colormap(style):
     colormap = LinearSegmentedColormap.from_list('custom_colormap', list(zip(positions, colors)))
     return colormap
 
+
 def get_fermi_by_vaspkit(path="./FERMI_ENERGY"):
     """
     备用方法，暂未使用。
@@ -140,6 +84,7 @@ def get_fermi_by_vaspkit(path="./FERMI_ENERGY"):
         dataline = file.readlines()
         fermi = float(dataline[1].split()[0])
     return fermi
+
 
 def get_fermi(outcar="./OUTCAR"):
     key_text = "E-fermi"
@@ -158,7 +103,8 @@ def get_fermi(outcar="./OUTCAR"):
 def 添加外边缘(ax, sym):
     length = 1
     if sym == "hex":  # 六角胞
-        point_complex = length * np.sqrt(3) / 3 * np.exp(1j * np.pi * (1. / 6 + 1. / 3 * np.arange(7)))
+        angles = np.pi * (1 / 6 + 1 / 3 * np.arange(7))
+        points = length * np.sqrt(3) / 3 * np.exp(1j * angles)
         points = np.c_[point_complex.real, point_complex.imag]
     elif sym == "rec":  # 矩形胞
         l = 0.5 * length
