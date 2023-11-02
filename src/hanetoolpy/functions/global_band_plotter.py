@@ -7,7 +7,7 @@ import matplotlib
 import numpy as np
 import pandas as pd
 import typer
-from hanetool.utils.vasp.eigenval import Eigenval
+from hanetoolpy.utils.vasp.eigenval import Eigenval
 from matplotlib import pyplot as plt
 from matplotlib.patches import Polygon
 from rich.console import Console
