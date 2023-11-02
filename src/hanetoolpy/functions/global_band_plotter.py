@@ -105,7 +105,7 @@ def 添加外边缘(ax, sym):
     if sym == "hex":  # 六角胞
         angles = np.pi * (1 / 6 + 1 / 3 * np.arange(7))
         points = length * np.sqrt(3) / 3 * np.exp(1j * angles)
-        points = np.c_[point_complex.real, point_complex.imag]
+        points = np.c_[points.real, points.imag]
     elif sym == "rec":  # 矩形胞
         l = 0.5 * length
         points = [(l, l), (-l, l), (-l, -l), (l, -l)]
