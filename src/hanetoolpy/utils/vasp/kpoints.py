@@ -5,6 +5,7 @@ from pymatgen.io.vasp import Kpoints
 
 def add_kpoints(kpoints1: Kpoints, kpoints2: Kpoints):
     result = deepcopy(kpoints1)
+    result.comment += f" + {kpoints2.comment}"
     result.num_kpts += kpoints2.num_kpts
     result.kpts.extend(kpoints2.kpts)
     result.kpts_weights.extend(kpoints2.kpts_weights)
@@ -38,7 +39,8 @@ def kpoints_from_kpts(kpts: list, kpts_weights, labels=None):
         kpts_weights = [0] * num_kpts
     if labels is None:
         labels = [""] * num_kpts
-    return Kpoints(style="Reciprocal",
+    return Kpoints(comment="kpoints_from_kpts",
+                   style="Reciprocal",
                    num_kpts=num_kpts,
                    kpts=kpts,
                    kpts_weights=kpts_weights,
