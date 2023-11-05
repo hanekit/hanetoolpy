@@ -1,6 +1,7 @@
 import logging
 from pathlib import Path
 
+import typer
 from rich import print
 from typing_extensions import Annotated
 
