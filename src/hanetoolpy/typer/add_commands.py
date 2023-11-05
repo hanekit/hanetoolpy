@@ -43,16 +43,16 @@ def add_commands(parent):
         thirdorder.command("reap", rich_help_panel="Main")(reap)
 
     from hanetoolpy.functions.thirdorder \
-        import check_thirdorder_jobs as thirdorder_f101
-    thirdorder.command("f101")(thirdorder_f101)
+        import check_thirdorder_jobs as thirdorder_check
+    thirdorder.command("check", rich_help_panel="Tools")(thirdorder_check)
 
     from hanetoolpy.functions.thirdorder \
-        import organize_files as thirdorder_f102
-    thirdorder.command("f102")(thirdorder_f102)
+        import organize_files as thirdorder_f101
+    thirdorder.command("f101", rich_help_panel="Others")(thirdorder_f101)
 
     from hanetoolpy.functions.thirdorder \
-        import check_duplicates as thirdorder_f103
-    thirdorder.command("f103")(thirdorder_f103)
+        import check_duplicates as thirdorder_f102
+    thirdorder.command("f102", rich_help_panel="Others")(thirdorder_f102)
 
     # phonopy
     phonopy = typer.Typer(no_args_is_help=True,
@@ -62,3 +62,17 @@ def add_commands(parent):
     # phonopy 子命令
     from hanetoolpy.functions.rms import main as rms
     phonopy.command("rms")(rms)
+
+    # # test
+    # test = typer.Typer(
+    #     no_args_is_help=True,
+    #     invoke_without_command=True)
+    # parent.add_typer(test, name="test", help="test tools")
+    # from hanetoolpy.functions.test_func import typer_commands as test_commands
+    # add_commands_dict(test, test_commands)
+
+
+def add_commands_dict(parent, commands_dict):
+    for group, value in commands_dict.items():
+        for name, func in value.items():
+            parent.command(name, rich_help_panel=group)(func)

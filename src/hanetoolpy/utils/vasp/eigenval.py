@@ -1,17 +1,26 @@
+from pathlib import Path
+
 import pandas as pd
 from rich import print
 from rich.table import Table
 
 
 class Eigenval:
-    def __init__(self, path="./EIGENVAL", soc=False):
-        self.path = path
+    def __init__(self, path=".", soc=False):
+        self.path = self.get_path(path)
         self.index_VB = None
         self.index_CB = None
         self.df = None
         self.soc = soc
         self.read()
         self.info = self.get_info()
+
+    def get_path(self, path):
+        path = Path(path)
+        if path.is_dir():
+            return path / "EIGENVAL"
+        else:
+            return path
 
     def print_table(self):
         table = Table(title="The data of bands")
@@ -61,20 +70,22 @@ class Eigenval:
         else:
             return band_data.loc[:, ["k_a", "k_b", "energy"]]
 
-    def get_info(self):
+    def get_info(self) -> dict:
         df = self.df
         line_vbm = df[df['band_index'] == self.index_VB - 1].nlargest(1, 'energy')
         line_cbm = df[df['band_index'] == self.index_CB - 1].nsmallest(1, 'energy')
         data = {
+            "file_path": str(self.path),
+            "file_absolute_path": str(Path(self.path).resolve()),
             "VB_index": self.index_VB,
             "CB_index": self.index_CB,
-            "VBM_energy": line_vbm["energy"].iloc[0],
-            "CBM_energy": line_cbm["energy"].iloc[0],
+            "VBM_energy": float(line_vbm["energy"].iloc[0]),
+            "CBM_energy": float(line_cbm["energy"].iloc[0]),
             "VBM_kabc": line_vbm[["k_a", "k_b", "k_c"]].values.flatten().tolist(),
             "CBM_kabc": line_cbm[["k_a", "k_b", "k_c"]].values.flatten().tolist(),
         }
         data["gap_type"] = "Direct" if (data["VBM_kabc"] == data["CBM_kabc"]) else "Indirect"
-        data["gap_energy"] =  round(data["CBM_energy"] - data["VBM_energy"], 10)
+        data["gap_energy"] = round(data["CBM_energy"] - data["VBM_energy"], 10)
         return data
 
     def print_info(self):
@@ -107,7 +118,15 @@ class Eigenval:
 
 
 if __name__ == '__main__':
-    eigenval = Eigenval()
+    path = "./test_files/EIGENVAL"
+    eigenval = Eigenval(path)
     eigenval.print_info()
     data = eigenval.get_info()
+
     print(data)
+    import json
+    with open("./test_files/data.json", "w") as json_file:
+        json.dump(data, json_file)
+    import toml
+    with open("./test_files/data.toml", "w") as toml_file:
+        toml.dump(data, toml_file)

@@ -11,3 +11,11 @@ default_vasp_ncore = 1
 default_vasp_logfile = "vasp.log"
 
 [pbs]
+nodes = 1
+ppn = 8
+pre_commands = [
+"cd ${PBS_O_WORKDIR}",
+]
+post_commands = [
+]
+
