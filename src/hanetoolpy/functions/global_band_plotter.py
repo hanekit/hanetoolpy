@@ -8,6 +8,7 @@ import numpy as np
 import pandas as pd
 import typer
 from hanetoolpy.utils.vasp.eigenval import Eigenval
+from hanetoolpy.utils.vasp.outcar import get_fermi_energy
 from matplotlib import pyplot as plt
 from matplotlib.patches import Polygon
 from rich.console import Console
@@ -76,7 +77,7 @@ def get_colormap(style):
     return colormap
 
 
-def get_fermi_by_vaspkit(path="./FERMI_ENERGY"):
+def get_fermi_energy_by_vaspkit(path="./FERMI_ENERGY"):
     """
     备用方法，暂未使用。
     """
@@ -84,20 +85,6 @@ def get_fermi_by_vaspkit(path="./FERMI_ENERGY"):
         dataline = file.readlines()
         fermi = float(dataline[1].split()[0])
     return fermi
-
-
-def get_fermi(outcar="./OUTCAR"):
-    key_text = "E-fermi"
-    with open(outcar, 'r') as file:
-        lines = file.readlines()
-    for line_number, line in enumerate(lines, start=1):
-        if key_text in line:
-            # info("Find \"E-fermi\" line:")
-            # text = f"{line_number} |" + line.replace("\n", "")
-            # print(Panel(text, title=outcar))
-            e_fermi = float(line.split()[2])
-    info(f"Get Fermi energy: {e_fermi} eV")
-    return e_fermi
 
 
 def 添加外边缘(ax, sym):
@@ -257,7 +244,7 @@ def plot(sym: Annotated[str, typer.Option(help="(hex/rec) Symmetry of the system
     e = points[:, 2]
     # 费密能级设置为 0
     if minus_fermi:
-        fermi = get_fermi()
+        fermi = get_fermi_energy()
         e = e - fermi
     # 绘图
     fig, ax = plt.subplots()  # 创建画布
