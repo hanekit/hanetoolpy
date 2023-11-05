@@ -30,12 +30,17 @@ def is_vasp_end(path="./"):
         return False
 
 
-def get_band_info(path="./", save=True, save_path="./hanetoolpy-band_info.toml"):
+def get_band_info(path: str = "./",
+                  save: bool = True,
+                  save_path: str = "./hanetoolpy-band_info.toml"):
+    """
+    Get information about the electron energy band edge and band gap.
+    """
     job_dir = Path(path).resolve()
     info_dict = dict()
 
     from hanetoolpy.utils.vasp.eigenval import Eigenval
-    eigenval = Eigenval(job_dir / "Eigenval")
+    eigenval = Eigenval(job_dir / "EIGENVAL")
     info_dict.update(eigenval.get_info())
 
     from hanetoolpy.utils.vasp.outcar import get_fermi_energy
