@@ -10,8 +10,9 @@ def add_commands(parent):
     # 添加 vasp 子命令
     from hanetoolpy.functions.vasp_run import vasp_run
     vasp.command("run")(vasp_run)
-    from hanetoolpy.functions.vasp import check_vasp_end
+    from hanetoolpy.functions.vasp import check_vasp_end, get_band_info
     vasp.command("check_end")(check_vasp_end)
+    vasp.command("band_info")(get_band_info)
     from hanetoolpy.functions.vasp_stop import vasp_stop
     vasp.command("stop", no_args_is_help=True)(vasp_stop)
     from hanetoolpy.functions.global_band_plotter import plot as f101

@@ -70,13 +70,11 @@ class Eigenval:
         else:
             return band_data.loc[:, ["k_a", "k_b", "energy"]]
 
-    def get_info(self) -> dict:
+    def get_info(self, detail=False) -> dict:
         df = self.df
         line_vbm = df[df['band_index'] == self.index_VB - 1].nlargest(1, 'energy')
         line_cbm = df[df['band_index'] == self.index_CB - 1].nsmallest(1, 'energy')
         data = {
-            "file_path": str(self.path),
-            "file_absolute_path": str(Path(self.path).resolve()),
             "VB_index": self.index_VB,
             "CB_index": self.index_CB,
             "VBM_energy": float(line_vbm["energy"].iloc[0]),
@@ -84,6 +82,12 @@ class Eigenval:
             "VBM_kabc": line_vbm[["k_a", "k_b", "k_c"]].values.flatten().tolist(),
             "CBM_kabc": line_cbm[["k_a", "k_b", "k_c"]].values.flatten().tolist(),
         }
+        if detail == True:
+            data.update({
+                "folder_name": str(self.path.parent.name),
+                "input_path": str(self.path),
+                "absolute_path": str(Path(self.path).resolve()),
+            })
         data["gap_type"] = "Direct" if (data["VBM_kabc"] == data["CBM_kabc"]) else "Indirect"
         data["gap_energy"] = round(data["CBM_energy"] - data["VBM_energy"], 10)
         return data
@@ -91,7 +95,6 @@ class Eigenval:
     def print_info(self):
         info = self.info
 
-        from rich.table import Table
         table = Table(title="Band edges\' quantities")
         table.add_column("Quantity", style="bold")
         table.add_column("VBM", justify="center")

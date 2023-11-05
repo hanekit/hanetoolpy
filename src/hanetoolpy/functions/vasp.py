@@ -1,5 +1,8 @@
-from pathlib import Path
 import logging
+from pathlib import Path
+
+from rich import print
+
 
 def check_vasp_end(path="./"):
     path = Path(path).resolve()
@@ -8,6 +11,7 @@ def check_vasp_end(path="./"):
         logging.info(f"[v] {path} finished.")
     else:
         logging.info(f"[x] {path} unfinished.")
+
 
 def is_vasp_end(path="./"):
     """
@@ -24,3 +28,44 @@ def is_vasp_end(path="./"):
                 return "Running"
     else:
         return False
+
+
+def get_band_info(path="./", save=True, save_path="./hanetoolpy-band_info.toml"):
+    job_dir = Path(path).resolve()
+    info_dict = dict()
+
+    from hanetoolpy.utils.vasp.eigenval import Eigenval
+    eigenval = Eigenval(job_dir / "Eigenval")
+    info_dict.update(eigenval.get_info())
+
+    from hanetoolpy.utils.vasp.outcar import get_fermi_energy
+    fermi_energy = get_fermi_energy(job_dir / "OUTCAR")
+    data = {
+        "fermi_energy": fermi_energy,
+        "VBM_fermi": round(info_dict["VBM_energy"] - fermi_energy, 10),
+        "CBM_fermi": round(info_dict["CBM_energy"] - fermi_energy, 10),
+    }
+    info_dict.update(data)
+
+    from rich.table import Table
+    table = Table(title="Band Information")
+    table.add_column("quantity")
+    table.add_column("value")
+    for key, value in info_dict.items():
+        table.add_row(str(key), str(value))
+    print(table)
+
+    if save:
+        logging.info(f"Saving band information to \"{save_path}\".")
+        import toml
+        with open(save_path, "w") as file:
+            toml.dump(info_dict, file)
+
+    logging.info(f"Finish!")
+
+
+if __name__ == '__main__':
+    logging.basicConfig(level=logging.INFO,
+                        format='[%(asctime)s][%(levelname)-s]: %(message)s',
+                        datefmt='%Y-%m-%d %H:%M:%S')
+    get_band_info("../utils/vasp/test_files", save="../utils/vasp/test_files/1.toml")
