@@ -2,6 +2,7 @@ import logging
 from pathlib import Path
 
 from rich import print
+from typing_extensions import Annotated
 
 
 def check_vasp_end(path="./"):
