@@ -30,9 +30,14 @@ def is_vasp_end(path="./"):
         return False
 
 
-def get_band_info(path: str = "./",
-                  save: bool = True,
-                  save_path: str = "./hanetoolpy-band_info.toml"):
+def get_band_info(
+    path: Annotated[
+        str, typer.Option(help="The path of vasp workdir")] = "./",
+    save: Annotated[
+        bool, typer.Option(help="Whether to save information to save_path")] = True,
+    save_path: Annotated[
+        str, typer.Option(help="The file path to save information")] = "./hanetoolpy-band_info.toml",
+):
     """
     Get information about the electron energy band edge and band gap.
     """
