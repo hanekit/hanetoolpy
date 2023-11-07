@@ -56,10 +56,12 @@ def plot_rms(df, order):
     return plt
 
 
-def main(plot: bool = True,
-         order: bool = False):
+def main(path: str = "FORCE_CONSTANTS",
+         plot: bool = True,
+         order: bool = False,
+         savename: str = "hanetoolpy-RMS_of_2FC"):
     """
-    Plot RMS of FORCE_CONSTANTS.
+    Calculate and plot the root mean square (RMS) of FORCE_CONSTANTS.
 
     \b
     Required files:
@@ -72,7 +74,7 @@ def main(plot: bool = True,
     """
     # 读取文件
     logging.info("(1/4) Reading FORCE_CONSTANTS ...")
-    df = read_force_constants()
+    df = read_force_constants(path)
     # 计算 RMS
     logging.info("(2/4) Calculating RMS ...")
     df["rms"] = (df[tensor].apply(lambda row: row.astype(float).pow(2)).sum(axis=1) / 9) ** 0.5
@@ -83,11 +85,13 @@ def main(plot: bool = True,
     df["distance"] = df.apply(lambda row: get_distance(
         structure, row["atom_a"], row["atom_b"]), axis=1)
     # 输出结果
-    logging.info("(4/4) Output the results ...")
-    df[["distance", "rms", "atom_a", "atom_b"]].to_csv("rms.csv", index=False)
+    logging.info("(4/4) Saving the results ...")
+    df[["distance", "rms", "atom_a", "atom_b"]].to_csv(f"{savename}.csv", index=False)
+    logging.info(f"{savename}.csv saved.")
     if plot:
         plot_rms(df, order)
-        plt.savefig("rms.png")
+        plt.savefig(f"{savename}.png")
+        logging.info(f"{savename}.png saved.")
     # 结束
     logging.info("Finish!")
 
