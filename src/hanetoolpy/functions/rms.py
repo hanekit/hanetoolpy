@@ -46,14 +46,18 @@ def read_force_constants(path="FORCE_CONSTANTS"):
     return df
 
 
-def plot_rms(df):
+def plot_rms(df, order):
     x = df["distance"]
     y = df["rms"]
     plt.scatter(x, y)
+    if order:
+        # TODO
+        pass
     return plt
 
 
-def main():
+def main(plot: bool = True,
+         order: bool = False):
     """
     Plot RMS of FORCE_CONSTANTS.
 
@@ -76,14 +80,17 @@ def main():
     logging.info("(3/4) Calculating atom distance ...")
     from pymatgen.core import Structure
     structure = Structure.from_file("SPOSCAR")
-    df["distance"] = df.apply(lambda row: get_distance(structure, row["atom_a"], row["atom_b"]), axis=1)
+    df["distance"] = df.apply(lambda row: get_distance(
+        structure, row["atom_a"], row["atom_b"]), axis=1)
     # 输出结果
     logging.info("(4/4) Output the results ...")
-    df[["distance", "rms","atom_a","atom_b"]].to_csv("rms.csv", index=False)
-    plot_rms(df)
-    plt.savefig("rms.png")
+    df[["distance", "rms", "atom_a", "atom_b"]].to_csv("rms.csv", index=False)
+    if plot:
+        plot_rms(df, order)
+        plt.savefig("rms.png")
     # 结束
     logging.info("Finish!")
+
 
 if __name__ == '__main__':
     main()
