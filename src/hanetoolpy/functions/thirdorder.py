@@ -156,6 +156,33 @@ def recutoff(old_work_path, new_work_path):
             old_job = old_jobs[old_headers.index(new_header)]
             print(f"new-{new_job.name} = old-{old_job.name}")
 
+def get_order_distance(poscar, na, nb, nc, maxorder=100):
+    import pandas as pd
+    from hanetoolpy.external.thirdorder.thirdorder_common import (calc_dists,
+                                                                  calc_frange,
+                                                                  gen_SPOSCAR)
+    from hanetoolpy.functions.thirdorder_vasp_repackage import read_POSCAR
+    poscar = read_POSCAR(poscar)
+    sposcar = gen_SPOSCAR(poscar, na, nb, nc)
+    dmin, nequi, shifts = calc_dists(sposcar)
+    result = dict()
+    prev_frange = 0
+    for nth in range(maxorder + 1):
+        frange = calc_frange(poscar=poscar,
+                             sposcar=None,
+                             n=nth,
+                             dmin=dmin)
+        if frange == prev_frange:
+            break
+        else:
+            result[nth] = frange
+            prev_frange = frange
+    df = pd.DataFrame(pd.DataFrame(list(result.items()), columns=['Order', 'Distance_(nm)']))
+    df["Distance_(Ang)"] = df["Distance_(nm)"] * 10
+    print(df.to_string(index=False))
+    return result
+
+
 
 if __name__ == '__main__':
     check_duplicates("./jobs")

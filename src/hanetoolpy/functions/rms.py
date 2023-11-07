@@ -1,9 +1,9 @@
 import logging
+from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-
 
 tensor = ["xx", "xy", "xz",
           "yx", "yy", "yz",
@@ -46,17 +46,25 @@ def read_force_constants(path="FORCE_CONSTANTS"):
     return df
 
 
-def plot_rms(df, order):
+def plot_rms(df, order, poscar=None):
     x = df["distance"]
     y = df["rms"]
     plt.scatter(x, y)
     if order:
-        # TODO
-        pass
+        from hanetoolpy.functions.thirdorder import get_order_distance
+        import numpy as np
+        result = get_order_distance(poscar, 2,3,1)
+        order = np.array(list(result.keys()))
+        distance = np.array(list(result.values())) * 10
+        for order, distance in result.items():
+            plt.axvline(distance * 10, color='grey', linestyle='--', label='order', linewidth=0.8)
+            plt.text(distance * 10 + 0.1, max(y)/2, order, ha='left', va='center', color='grey')
+    plt.xlabel('Distance (Ang)')
+    plt.ylabel('RMS')
     return plt
 
 
-def main(path: str = "FORCE_CONSTANTS",
+def main(workdir: str = "./",
          plot: bool = True,
          order: bool = False,
          savename: str = "hanetoolpy-RMS_of_2FC"):
@@ -73,28 +81,29 @@ def main(path: str = "FORCE_CONSTANTS",
     | rms.png
     """
     # 读取文件
+    workdir = Path(workdir).resolve()
     logging.info("(1/4) Reading FORCE_CONSTANTS ...")
-    df = read_force_constants(path)
+    df = read_force_constants(workdir / "FORCE_CONSTANTS")
     # 计算 RMS
     logging.info("(2/4) Calculating RMS ...")
     df["rms"] = (df[tensor].apply(lambda row: row.astype(float).pow(2)).sum(axis=1) / 9) ** 0.5
     # 计算距离
     logging.info("(3/4) Calculating atom distance ...")
     from pymatgen.core import Structure
-    structure = Structure.from_file("SPOSCAR")
+    structure = Structure.from_file(workdir / "SPOSCAR")
     df["distance"] = df.apply(lambda row: get_distance(
         structure, row["atom_a"], row["atom_b"]), axis=1)
     # 输出结果
     logging.info("(4/4) Saving the results ...")
-    df[["distance", "rms", "atom_a", "atom_b"]].to_csv(f"{savename}.csv", index=False)
+    df[["distance", "rms", "atom_a", "atom_b"]].to_csv(workdir / f"{savename}.csv", index=False)
     logging.info(f"{savename}.csv saved.")
     if plot:
-        plot_rms(df, order)
-        plt.savefig(f"{savename}.png")
+        plot_rms(df, order, poscar=workdir / "POSCAR")
+        plt.savefig(workdir / f"{savename}.png")
         logging.info(f"{savename}.png saved.")
     # 结束
     logging.info("Finish!")
 
 
 if __name__ == '__main__':
-    main()
+    main(workdir="../test_files/rms",order=True)
