@@ -53,12 +53,15 @@ def plot_rms(df, order, poscar=None):
     if order:
         from hanetoolpy.functions.thirdorder import get_order_distance
         import numpy as np
-        result = get_order_distance(poscar, 2,3,1)
+        print("Not currently available, read supercell size not yet implemented")
+        result = get_order_distance(poscar, 4, 4, 1)  # TODO!!!
         order = np.array(list(result.keys()))
         distance = np.array(list(result.values())) * 10
+        text_y_list = np.linspace(0.9, 0.2, len(result)) * max(y)
         for order, distance in result.items():
             plt.axvline(distance * 10, color='grey', linestyle='--', label='order', linewidth=0.8)
-            plt.text(distance * 10 + 0.1, max(y)/2, order, ha='left', va='center', color='grey')
+            plt.text(distance * 10 + 0.1, text_y_list[order],
+                     order, ha='left', va='center', color='grey')
     plt.xlabel('Distance (Ang)')
     plt.ylabel('RMS')
     return plt
