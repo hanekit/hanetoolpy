@@ -33,7 +33,7 @@ def check_thirdorder_jobs(path: str = "./",
     status_text = "".join(status)
     status_count = {}
     status_count["finished"] = status.count("#")
-    status_count["unfinished"] = len(status_text)-status.count("#")
+    status_count["unfinished"] = len(status_text) - status.count("#")
     status_count["running"] = status.count("R")
     status_count["unstarted"] = status.count("_")
 
@@ -49,7 +49,7 @@ def check_thirdorder_jobs(path: str = "./",
         for i in range(0, last_job_num, gap):
             start_index = i
             end_index = min(i + gap, last_job_num)
-            line = f"{start_index+1:03} {text[start_index:end_index]} {end_index:03}"
+            line = f"{start_index + 1:03} {text[start_index:end_index]} {end_index:03}"
             result.append(line)
         return '\n'.join(result)
 
@@ -61,23 +61,23 @@ def check_thirdorder_jobs(path: str = "./",
 
 
 def organize_files(
-    poscar_dir: Annotated[str, typer.Option(
-        help="Directory containing 3RD.POSCAR.* files.",
-        metavar="PATH")] = './',
-    jobs_dir: Annotated[str, typer.Option(
-        "--workdir", help="Directory to run jobs.",
-        metavar="PATH")] = "./jobs",
-    incar_path: Annotated[str, typer.Option(
-        "--incar", help="Path to INCAR file.",
-        metavar="PATH", rich_help_panel="Input files")] = './INCAR',
-    kpoints_path: Annotated[str, typer.Option(
-        "--kpoints", help="Path to KPOINTS file.",
-        metavar="PATH", rich_help_panel="Input files")] = './KPOINTS',
-    potcar_path: Annotated[str, typer.Option(
-        "--potcar", help="Path to POTCAR file.",
-        metavar="PATH", rich_help_panel="Input files")] = './POTCAR',
-    method: Annotated[str, typer.Option(
-        help="(softlink/copy) Method for organizing files.")] = 'softlink',
+        poscar_dir: Annotated[str, typer.Option(
+            help="Directory containing 3RD.POSCAR.* files.",
+            metavar="PATH")] = './',
+        jobs_dir: Annotated[str, typer.Option(
+            "--workdir", help="Directory to run jobs.",
+            metavar="PATH")] = "./jobs",
+        incar_path: Annotated[str, typer.Option(
+            "--incar", help="Path to INCAR file.",
+            metavar="PATH", rich_help_panel="Input files")] = './INCAR',
+        kpoints_path: Annotated[str, typer.Option(
+            "--kpoints", help="Path to KPOINTS file.",
+            metavar="PATH", rich_help_panel="Input files")] = './KPOINTS',
+        potcar_path: Annotated[str, typer.Option(
+            "--potcar", help="Path to POTCAR file.",
+            metavar="PATH", rich_help_panel="Input files")] = './POTCAR',
+        method: Annotated[str, typer.Option(
+            help="(softlink/copy) Method for organizing files.")] = 'softlink',
 ):
     """
     Move the 3RD.POSCAR.* to job-* folders with INCAR KPOINTS POTCAR files.
@@ -103,10 +103,10 @@ def organize_files(
             file_destination = job_dir / file_name
             if method[0].lower() == 's':  # for softlink
                 file_destination.symlink_to(file_source)
-                logging.info(str(file_source)+"\tlink to\t" + str(file_destination))
+                logging.info(str(file_source) + "\tlink to\t" + str(file_destination))
             elif method[0].lower() == 'c':  # for copy
                 shutil.copy(file_source, file_destination)
-                logging.info(str(file_source)+"\tcopy to\t" + str(file_destination))
+                logging.info(str(file_source) + "\tcopy to\t" + str(file_destination))
             else:
                 logging.error(f'Unsupported method: {method}')
             # info(f'Created {method} file for {config_file} in {job_dir}')
@@ -156,6 +156,7 @@ def recutoff(old_work_path, new_work_path):
             old_job = old_jobs[old_headers.index(new_header)]
             print(f"new-{new_job.name} = old-{old_job.name}")
 
+
 def get_order_distance(poscar, na, nb, nc, maxorder=100):
     import pandas as pd
     from hanetoolpy.external.thirdorder.thirdorder_common import (calc_dists,
@@ -181,7 +182,6 @@ def get_order_distance(poscar, na, nb, nc, maxorder=100):
     df["Distance_(Ang)"] = df["Distance_(nm)"] * 10
     print(df.to_string(index=False))
     return result
-
 
 
 if __name__ == '__main__':
