@@ -12,12 +12,12 @@ tensor = ["xx", "xy", "xz",
 
 def get_distance(structure, atom_a, atom_b):
     # 获取分数坐标
-    atom_a_abc = structure[int(atom_a)-1].frac_coords
-    atom_b_abc = structure[int(atom_b)-1].frac_coords
+    atom_a_abc = structure[int(atom_a) - 1].frac_coords
+    atom_b_abc = structure[int(atom_b) - 1].frac_coords
     # 计算分数坐标差
     diff_abc = []
     for i in range(3):
-        diff_i = float(atom_b_abc[i])-float(atom_a_abc[i])
+        diff_i = float(atom_b_abc[i]) - float(atom_a_abc[i])
         # 去除周期性
         if diff_i > 0.5:
             diff_i = diff_i - 1
@@ -37,7 +37,7 @@ def read_force_constants(path="FORCE_CONSTANTS"):
     with open(path, "r") as file:
         lines = file.readlines()
     # 去除首行，后每 4 行为一组
-    data_groups = [" ".join(lines[i:i+4]) for i in range(1, len(lines), 4)]
+    data_groups = [" ".join(lines[i:i + 4]) for i in range(1, len(lines), 4)]
     # 分列每组数据，得到二维列表
     data_list = [i.split() for i in data_groups]
     # 创建 DataFrame
@@ -46,15 +46,17 @@ def read_force_constants(path="FORCE_CONSTANTS"):
     return df
 
 
-def plot_rms(df, order, poscar=None):
+def plot_rms(df, order=False, poscar=None, na=None, nb=None, nc=None):
     x = df["distance"]
     y = df["rms"]
     plt.scatter(x, y)
     if order:
+        if None in [na, nb, nc]:
+            print("if order is True, please input the na, nb, and nc correctly.")
+            raise Error
         from hanetoolpy.functions.thirdorder import get_order_distance
         import numpy as np
-        print("Not currently available, read supercell size not yet implemented")
-        result = get_order_distance(poscar, 4, 4, 1)  # TODO!!!
+        result = get_order_distance(poscar, na, nb, nc)
         order = np.array(list(result.keys()))
         distance = np.array(list(result.values())) * 10
         text_y_list = np.linspace(0.9, 0.2, len(result)) * max(y)
@@ -70,9 +72,10 @@ def plot_rms(df, order, poscar=None):
 def main(workdir: str = "./",
          plot: bool = True,
          order: bool = False,
-         savename: str = "hanetoolpy-RMS_of_2FC"):
+         savename: str = "hanetoolpy-RMS_of_2FC",
+         na=None, nb=None, nc=None):
     """
-    Calculate and plot the root mean square (RMS) of FORCE_CONSTANTS.
+    Calculate and plot the root-mean-square (RMS) of FORCE_CONSTANTS.
 
     \b
     Required files:
@@ -101,7 +104,7 @@ def main(workdir: str = "./",
     df[["distance", "rms", "atom_a", "atom_b"]].to_csv(workdir / f"{savename}.csv", index=False)
     logging.info(f"{savename}.csv saved.")
     if plot:
-        plot_rms(df, order, poscar=workdir / "POSCAR")
+        plot_rms(df, order, poscar=workdir / "POSCAR", na=na, nb=nb, nc=nc)
         plt.savefig(workdir / f"{savename}.png")
         logging.info(f"{savename}.png saved.")
     # 结束
@@ -109,4 +112,4 @@ def main(workdir: str = "./",
 
 
 if __name__ == '__main__':
-    main(workdir="../test_files/rms",order=True)
+    main(workdir="../test_files/rms", order=True)
