@@ -2,10 +2,11 @@ import glob
 import logging
 import shutil
 from pathlib import Path
+from typing import Tuple
 
+import numpy as np
 import pandas as pd
 import typer
-from typing import Tuple
 from typing_extensions import Annotated
 
 
@@ -159,6 +160,41 @@ def recutoff(old_work_path, new_work_path):
             print(f"new-{new_job.name} = old-{old_job.name}")
 
 
+def read_poscar_for_thirdorder(poscar_path):
+    """
+    Return all the relevant information contained in a POSCAR file.
+    """
+    with open(poscar_path, "r") as f:
+        lines = f.readlines()
+
+    data = dict()
+
+    # data["comment"] = lines[0]
+
+    data["lattvec"] = np.empty((3, 3))
+    factor = 0.1 * float(lines[1].strip())  # Ang -> nm
+    for i in range(3):
+        data["lattvec"][:, i] = lines[2+i].split()
+    data["lattvec"] *= factor
+
+    data["elements"] = lines[5].split()
+    data["numbers"] = np.array(lines[6].split()).astype(np.intc)
+
+    typeline = lines[7]
+
+    natoms = data["numbers"].sum()
+    data["positions"] = np.empty((3, natoms))
+    for i in range(natoms):
+        data["positions"][:, i] = [float(j) for j in lines[8+i].split()]
+
+    data["types"] = [i for i, num in enumerate(data["numbers"]) for _ in range(num)]
+
+    if typeline[0].lower() in ["c", "k"]:
+        data["positions"] = sp.linalg.solve(data["lattvec"],
+                                            data["positions"] * factor)
+    return data
+
+
 def get_order_distance(
         poscar: Annotated[
             str,
@@ -173,31 +209,15 @@ def get_order_distance(
     """
     # from thirdorder_common import functions
     try:
-        from hanetoolpy.external.thirdorder.thirdorder_common import (calc_dists,
-                                                                      calc_frange,
-                                                                      gen_SPOSCAR)
+        from hanetoolpy.external.thirdorder.thirdorder_common import (
+            calc_dists, calc_frange, gen_SPOSCAR)
     except ModuleNotFoundError as e:
         logging.error("you need to put the thirdorder_common.py to \
 hanetoolpy/external/thirdorder/thirdorder_common.py")
         quit()
 
-    # from thirdorder_vasp import read_POSCAR
-    try:
-        from hanetoolpy.functions.thirdorder_vasp_repackage import read_POSCAR
-    except ModuleNotFoundError as e:
-        try:
-            from hanetoolpy.external.thirdorder.thirdorder_vasp import read_POSCAR
-        except ModuleNotFoundError as e:
-            logging.error("you need to put the thirdorder_vasp.py to \
-hanetoolpy/external/thirdorder/thirdorder_vasp.py")
-            quit()
-    # read POSCAR
-        else:
-            poscar = read_POSCAR(str(Path(poscar).parent))
-    else:
-        poscar = read_POSCAR(poscar)
-
     na, nb, nc = supercell
+    poscar = read_poscar_for_thirdorder(poscar)
     sposcar = gen_SPOSCAR(poscar, na, nb, nc)
     dmin, nequi, shifts = calc_dists(sposcar)
     result = dict()
