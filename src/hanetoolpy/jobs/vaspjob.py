@@ -34,6 +34,12 @@ class BaseVaspJob:
     def track(self):
         run(f"tail -f {self.logfile}", shell=True)
 
+    def run(self):
+        mpi_command = config["mpi"]["default_mpi_command"]
+        mpi_perfix = f"{mpi_command} -n {self.ppn}"
+        submit_command = f"time {mpi_perfix} {self.vasp_command} > {self.logfile}"
+        run(submit_command, shell=True)
+
 
 if __name__ == '__main__':
     print("Finish!")

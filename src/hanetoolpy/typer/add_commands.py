@@ -68,6 +68,16 @@ def add_commands(parent):
     from hanetoolpy.functions.rms import rms as rms
     phonopy.command("rms")(rms)
 
+    # pbs 主命令
+    pbs = typer.Typer(no_args_is_help=True,
+                      invoke_without_command=True)
+    parent.add_typer(pbs, name="pbs", help="PBS tools")
+
+    # pbs 子命令
+    from hanetoolpy.functions.pbs_run import run_sh_with_pbs, run_py_with_pbs
+    pbs.command("runsh")(run_sh_with_pbs)
+    pbs.command("runpy")(run_py_with_pbs)
+
     # # test
     # test = typer.Typer(
     #     no_args_is_help=True,
