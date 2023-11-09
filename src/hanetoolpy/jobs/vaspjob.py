@@ -15,19 +15,23 @@ config = get_config()
 class BaseVaspJob:
     def __init__(self,
                  vasp_command=config["vasp"]["default_vasp_command"],
+                 mpi_command=config["mpi"]["default_mpi_command"],
                  ppn=config["mpi"]["default_ppn"]):
         self.vasp_command = vasp_command
+        self.mpi_command = mpi_command
         self.ppn = ppn
         self.logfile = "vasp.log"
+
+    def get_command(self):
+        mpi_perfix = f"{self.mpi_command} -n {self.ppn}"
+        return f"time {mpi_perfix} {self.vasp_command} > {self.logfile}"
 
     def submit(self):
         job = BasePbsJob()
         job.name = "VASP"
         job.ppn = self.ppn
         job.workdir = Path.cwd()
-        mpi_command = config["mpi"]["default_mpi_command"]
-        mpi_perfix = f"{mpi_command} -n {self.ppn}"
-        submit_command = f"time {mpi_perfix} {self.vasp_command} > {self.logfile}"
+        submit_command = self.get_command()
         job.commands.append(submit_command)
         job.submit()
 
@@ -35,10 +39,8 @@ class BaseVaspJob:
         run(f"tail -f {self.logfile}", shell=True)
 
     def run(self):
-        mpi_command = config["mpi"]["default_mpi_command"]
-        mpi_perfix = f"{mpi_command} -n {self.ppn}"
-        submit_command = f"time {mpi_perfix} {self.vasp_command} > {self.logfile}"
-        run(submit_command, shell=True)
+        command = self.get_command()
+        run(command, shell=True)
 
 
 if __name__ == '__main__':
