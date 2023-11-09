@@ -55,6 +55,10 @@ def add_commands(parent):
         import check_duplicates as thirdorder_f102
     thirdorder.command("f102", rich_help_panel="Others")(thirdorder_f102)
 
+    from hanetoolpy.functions.thirdorder \
+        import get_order_distance as thirdorder_f103
+    thirdorder.command("f103", rich_help_panel="Others")(thirdorder_f103)
+
     # phonopy
     phonopy = typer.Typer(no_args_is_help=True,
                           invoke_without_command=True)

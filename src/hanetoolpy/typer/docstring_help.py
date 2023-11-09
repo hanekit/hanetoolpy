@@ -1,5 +1,3 @@
-import typer
-
 import inspect
 from typing import Union, Iterable
 

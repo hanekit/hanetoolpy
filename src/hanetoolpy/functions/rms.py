@@ -49,14 +49,14 @@ def read_force_constants(path="FORCE_CONSTANTS"):
     return df
 
 
-def plot_rms(df, order=False, poscar=None, na=None, nb=None, nc=None):
+def plot_rms(df, order=False, poscar=None, supercell=None):
     x = df["distance"]
     y = df["rms"]
-    plt.scatter(x, y, marker='+', s=50, alpha=1, edgecolor="None")
+    plt.scatter(x, y, marker='+', s=50, alpha=1)
     if order:
         from hanetoolpy.functions.thirdorder import get_order_distance
         import numpy as np
-        result = get_order_distance(poscar, na, nb, nc)
+        result = get_order_distance(poscar, supercell)
         order = np.array(list(result.keys()))
         distance = np.array(list(result.values())) * 10
         text_y_list = np.linspace(0.9, 0.2, len(result)) * max(y)
@@ -72,28 +72,28 @@ def plot_rms(df, order=False, poscar=None, na=None, nb=None, nc=None):
 def rms(
         workdir: Annotated[
             str,
-            typer.Option("--workdir", "-d")] \
-                = "./",
+            typer.Option("--workdir", "-d")]
+    = "./",
         plot: Annotated[
             bool,
-            typer.Option()] \
-                = True,
+            typer.Option()]
+    = True,
         savename: Annotated[
             str,
-            typer.Option("--savename", "-s")] \
-                = "hanetoolpy-RMS_of_2FC",
+            typer.Option("--savename", "-s")]
+    = "hanetoolpy-RMS_of_2FC",
         order: Annotated[
             bool,
             typer.Option(rich_help_panel="Order arguments",
-                         help="Draws order vertical lines")] \
-                = False,
+                         help="Draws order vertical lines")]
+    = False,
         supercell: Annotated[
             Tuple[int, int, int],
             typer.Option("--supercell", "--sc",
                          rich_help_panel="Order arguments",
                          metavar="[INT * 3]",
-                         help="Size of supercell")] \
-                = (0, 0, 0),
+                         help="Size of supercell")]
+    = (0, 0, 0),
 ):
     """
     Calculate and plot the root-mean-square (RMS) of FORCE_CONSTANTS.
@@ -125,12 +125,11 @@ def rms(
     logging.info("(4/4) Saving the results ...")
     df[["distance", "rms", "atom_a", "atom_b"]].to_csv(workdir / f"{savename}.csv", index=False)
     logging.info(f"{savename}.csv saved.")
-    if order and supercell == (0,0,0) :
+    if order and supercell == (0, 0, 0):
         logging.error("if order is True, please input the --supercell.")
         quit()
     if plot:
-        na, nb, nc = supercell
-        plot_rms(df, order, poscar=workdir / "POSCAR", na=na, nb=nb, nc=nc)
+        plot_rms(df, order, poscar=workdir / "POSCAR", supercell=supercell)
         plt.savefig(workdir / f"{savename}.png")
         logging.info(f"{savename}.png saved.")
     # 结束

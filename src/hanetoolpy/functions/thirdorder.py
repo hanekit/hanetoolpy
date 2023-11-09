@@ -3,7 +3,9 @@ import logging
 import shutil
 from pathlib import Path
 
+import pandas as pd
 import typer
+from typing import Tuple
 from typing_extensions import Annotated
 
 
@@ -157,13 +159,45 @@ def recutoff(old_work_path, new_work_path):
             print(f"new-{new_job.name} = old-{old_job.name}")
 
 
-def get_order_distance(poscar, na, nb, nc, maxorder=100):
-    import pandas as pd
-    from hanetoolpy.external.thirdorder.thirdorder_common import (calc_dists,
-                                                                  calc_frange,
-                                                                  gen_SPOSCAR)
-    from hanetoolpy.functions.thirdorder_vasp_repackage import read_POSCAR
-    poscar = read_POSCAR(poscar)
+def get_order_distance(
+        poscar: Annotated[
+            str,
+            typer.Argument(help="path of 1x1x1 POSCAR")],
+        supercell: Annotated[
+            Tuple[int, int, int],
+            typer.Argument(metavar="[INT * 3]",
+                           help="Size of supercell")],
+        maxorder=100):
+    """
+    Get the relationship between nth nearest-neighbor cutoff and distance cutoff.
+    """
+    # from thirdorder_common import functions
+    try:
+        from hanetoolpy.external.thirdorder.thirdorder_common import (calc_dists,
+                                                                      calc_frange,
+                                                                      gen_SPOSCAR)
+    except ModuleNotFoundError as e:
+        logging.error("you need to put the thirdorder_common.py to \
+hanetoolpy/external/thirdorder/thirdorder_common.py")
+        quit()
+
+    # from thirdorder_vasp import read_POSCAR
+    try:
+        from hanetoolpy.functions.thirdorder_vasp_repackage import read_POSCAR
+    except ModuleNotFoundError as e:
+        try:
+            from hanetoolpy.external.thirdorder.thirdorder_vasp import read_POSCAR
+        except ModuleNotFoundError as e:
+            logging.error("you need to put the thirdorder_vasp.py to \
+hanetoolpy/external/thirdorder/thirdorder_vasp.py")
+            quit()
+    # read POSCAR
+        else:
+            poscar = read_POSCAR(str(Path(poscar).parent))
+    else:
+        poscar = read_POSCAR(poscar)
+
+    na, nb, nc = supercell
     sposcar = gen_SPOSCAR(poscar, na, nb, nc)
     dmin, nequi, shifts = calc_dists(sposcar)
     result = dict()
