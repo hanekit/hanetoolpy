@@ -8,6 +8,10 @@ from hanetoolpy.typer.add_commands import add_commands
 from rich.logging import RichHandler
 from typing_extensions import Annotated
 
+from .docstring_help import get_custom_help_text
+
+typer.rich_utils._get_help_text = get_custom_help_text
+
 app = typer.Typer(context_settings={"help_option_names": ["-h", "--help"]},  # 给帮助增加 -h 选项
                   add_completion=False,  # 去除默认参数选项
                   invoke_without_command=True  # 无子命令时运行 callback
