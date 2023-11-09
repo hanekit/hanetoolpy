@@ -4,6 +4,7 @@ from hanetoolpy.utils.config import get_config
 
 config = get_config()
 
+
 def vasp_run(command: str = config["vasp"]["default_vasp_command"],
              ppn: int = config["mpi"]["default_ppn"],
              mpi: str = config["mpi"]["default_mpi_command"],
@@ -13,7 +14,7 @@ def vasp_run(command: str = config["vasp"]["default_vasp_command"],
     """
     print_args(locals())
     job = BaseVaspJob()
-    job.vasp_command =command
+    job.vasp_command = command
     job.ppn = ppn
     job.submit()
     job.track()
