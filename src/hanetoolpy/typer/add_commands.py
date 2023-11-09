@@ -61,7 +61,7 @@ def add_commands(parent):
     parent.add_typer(phonopy, name="phonopy", help="phonopy tools")
 
     # phonopy 子命令
-    from hanetoolpy.functions.rms import main as rms
+    from hanetoolpy.functions.rms import rms as rms
     phonopy.command("rms")(rms)
 
     # # test

@@ -1,9 +1,12 @@
+from typing import Tuple
 import logging
 from pathlib import Path
+from typing_extensions import Annotated
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import typer
 
 tensor = ["xx", "xy", "xz",
           "yx", "yy", "yz",
@@ -49,11 +52,8 @@ def read_force_constants(path="FORCE_CONSTANTS"):
 def plot_rms(df, order=False, poscar=None, na=None, nb=None, nc=None):
     x = df["distance"]
     y = df["rms"]
-    plt.scatter(x, y)
+    plt.scatter(x, y, marker='+', s=50, alpha=1, edgecolor="None")
     if order:
-        if None in [na, nb, nc]:
-            print("if order is True, please input the na, nb, and nc correctly.")
-            raise Error
         from hanetoolpy.functions.thirdorder import get_order_distance
         import numpy as np
         result = get_order_distance(poscar, na, nb, nc)
@@ -69,11 +69,32 @@ def plot_rms(df, order=False, poscar=None, na=None, nb=None, nc=None):
     return plt
 
 
-def main(workdir: str = "./",
-         plot: bool = True,
-         order: bool = False,
-         savename: str = "hanetoolpy-RMS_of_2FC",
-         na=None, nb=None, nc=None):
+def rms(
+        workdir: Annotated[
+            str,
+            typer.Option("--workdir", "-d")] \
+                = "./",
+        plot: Annotated[
+            bool,
+            typer.Option()] \
+                = True,
+        savename: Annotated[
+            str,
+            typer.Option("--savename", "-s")] \
+                = "hanetoolpy-RMS_of_2FC",
+        order: Annotated[
+            bool,
+            typer.Option(rich_help_panel="Order arguments",
+                         help="Draws order vertical lines")] \
+                = False,
+        supercell: Annotated[
+            Tuple[int, int, int],
+            typer.Option("--supercell", "--sc",
+                         rich_help_panel="Order arguments",
+                         metavar="[INT * 3]",
+                         help="Size of supercell")] \
+                = (0, 0, 0),
+):
     """
     Calculate and plot the root-mean-square (RMS) of FORCE_CONSTANTS.
 
@@ -81,10 +102,11 @@ def main(workdir: str = "./",
     Required files:
     | FORCE_CONSTANTS
     | SPOSCAR
-    \b
+    Optional files:
+    | POSCAR
     Output files:
-    | rms.csv
-    | rms.png
+    | hanetoolpy-RMS_of_2FC.csv
+    | hanetoolpy-RMS_of_2FC.png
     """
     # 读取文件
     workdir = Path(workdir).resolve()
@@ -103,7 +125,11 @@ def main(workdir: str = "./",
     logging.info("(4/4) Saving the results ...")
     df[["distance", "rms", "atom_a", "atom_b"]].to_csv(workdir / f"{savename}.csv", index=False)
     logging.info(f"{savename}.csv saved.")
+    if order and supercell == (0,0,0) :
+        logging.error("if order is True, please input the --supercell.")
+        quit()
     if plot:
+        na, nb, nc = supercell
         plot_rms(df, order, poscar=workdir / "POSCAR", na=na, nb=nb, nc=nc)
         plt.savefig(workdir / f"{savename}.png")
         logging.info(f"{savename}.png saved.")
@@ -112,4 +138,4 @@ def main(workdir: str = "./",
 
 
 if __name__ == '__main__':
-    main(workdir="../test_files/rms", order=True)
+    rms(workdir="../test_files/rms", order=True)
