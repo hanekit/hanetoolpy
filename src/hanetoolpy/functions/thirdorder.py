@@ -160,9 +160,9 @@ def recutoff(old_work_path, new_work_path):
             print(f"new-{new_job.name} = old-{old_job.name}")
 
 
-def read_poscar_for_thirdorder(poscar_path):
+def read_poscar_for_thirdorder(poscar_path: str) -> dict:
     """
-    Return all the relevant information contained in a POSCAR file.
+    Return information of POSCAR file for thirdorder.
     """
     with open(poscar_path, "r") as f:
         lines = f.readlines()
@@ -174,7 +174,7 @@ def read_poscar_for_thirdorder(poscar_path):
     data["lattvec"] = np.empty((3, 3))
     factor = 0.1 * float(lines[1].strip())  # Ang -> nm
     for i in range(3):
-        data["lattvec"][:, i] = lines[2+i].split()
+        data["lattvec"][:, i] = lines[2 + i].split()
     data["lattvec"] *= factor
 
     data["elements"] = lines[5].split()
@@ -185,7 +185,7 @@ def read_poscar_for_thirdorder(poscar_path):
     natoms = data["numbers"].sum()
     data["positions"] = np.empty((3, natoms))
     for i in range(natoms):
-        data["positions"][:, i] = [float(j) for j in lines[8+i].split()]
+        data["positions"][:, i] = [float(j) for j in lines[8 + i].split()]
 
     data["types"] = [i for i, num in enumerate(data["numbers"]) for _ in range(num)]
 

@@ -72,28 +72,28 @@ def plot_rms(df, order=False, poscar=None, supercell=None):
 def rms(
         workdir: Annotated[
             str,
-            typer.Option("--workdir", "-d")]
-    = "./",
+            typer.Option("--workdir", "-d")] \
+                = "./",
         plot: Annotated[
             bool,
-            typer.Option()]
-    = True,
+            typer.Option()] \
+                = True,
         savename: Annotated[
             str,
-            typer.Option("--savename", "-s")]
-    = "hanetoolpy-RMS_of_2FC",
+            typer.Option("--savename", "-s")] \
+                = "hanetoolpy-RMS_of_2FC",
         order: Annotated[
             bool,
             typer.Option(rich_help_panel="Order arguments",
-                         help="Draws order vertical lines")]
-    = False,
+                         help="Draws order vertical lines")] \
+                = False,
         supercell: Annotated[
             Tuple[int, int, int],
             typer.Option("--supercell", "--sc",
                          rich_help_panel="Order arguments",
                          metavar="[INT * 3]",
-                         help="Size of supercell")]
-    = (0, 0, 0),
+                         help="Size of supercell")] \
+                = (0, 0, 0),
 ):
     """
     Calculate and plot the root-mean-square (RMS) of FORCE_CONSTANTS.
