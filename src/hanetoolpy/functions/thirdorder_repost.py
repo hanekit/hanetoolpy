@@ -7,26 +7,11 @@ import typer
 from hanetoolpy.about import external_packages_path
 from typing_extensions import Annotated
 
-thirdorder_package_path = external_packages_path / "thirdorder"
-thirdorder_vasp_path = thirdorder_package_path / "thirdorder_vasp.py"
+default_thirdorder_package_path = external_packages_path / "thirdorder"
+default_thirdorder_vasp_path = default_thirdorder_package_path / "thirdorder_vasp.py"
 
-def sow(
-        supercell: Annotated[Tuple[int, int, int], typer.Argument(metavar="[INT * 3]",
-                                                                  help="size of supercell")],
-        cutoff: Annotated[str, typer.Argument(metavar="-INT|+FLOAT",
-                                              help="negative integer (n-th) or positive float (Ang)")],
-        thirdorder_vasp_path: Annotated[str, typer.Argument(metavar="PATH",)] = thirdorder_vasp_path):
-    """
-    run the thirdorder_vasp.py sow
 
-    \b
-    Required files:
-    | POSCAR
-    \b
-    Output files:
-    | 3RD.SPOSCAR
-    | 3RD.POSCAR.*
-    """
+def check_thirdorder_vasp(thirdorder_vasp_path):
     try:
         import thirdorder_core
     except ModuleNotFoundError as error:
@@ -38,6 +23,30 @@ def sow(
         logging.error(f"Can not find the thirdorder_vasp.py at: \n {thirdorder_vasp_path}")
         logging.error(f"Please put this file into the above path, or specify the file path by argument.")
         raise typer.Abort()
+
+
+def sow(
+        supercell: Annotated[
+            Tuple[int, int, int], typer.Argument(metavar="[INT * 3]",
+                                                 help="size of supercell")],
+        cutoff: Annotated[
+            str, typer.Argument(metavar="-INT|+FLOAT",
+                                help="negative integer (n-th) or positive float (Ang)")],
+        thirdorder_vasp_path: Annotated[
+            str, typer.Argument(metavar="PATH", )] = default_thirdorder_vasp_path
+):
+    """
+    run the thirdorder_vasp.py sow
+
+    \b
+    Required files:
+    | POSCAR
+    \b
+    Output files:
+    | 3RD.SPOSCAR
+    | 3RD.POSCAR.*
+    """
+    check_thirdorder_vasp(thirdorder_vasp_path)
     python_command = "python"
     supercell = " ".join(map(str, supercell))
     command = f"{python_command} {thirdorder_vasp_path} sow {supercell} {cutoff}"
@@ -45,11 +54,17 @@ def sow(
 
 
 def reap(
-    supercell: Annotated[Tuple[int, int, int], typer.Argument(metavar="[INT * 3]",
-                                                              help="size of supercell")],
-    cutoff: Annotated[str, typer.Argument(metavar="-INT|+FLOAT",
-                                          help="negative integer (n-th) or positive float (Ang)")],
-    path: Annotated[str, typer.Argument()] = thirdorder_vasp_path,
+        supercell: Annotated[
+            Tuple[int, int, int], typer.Argument(metavar="[INT * 3]",
+                                                 help="size of supercell")],
+        cutoff: Annotated[
+            str, typer.Argument(metavar="-INT|+FLOAT",
+                                help="negative integer (n-th) or positive float (Ang)")],
+        thirdorder_vasp_path: Annotated[str, typer.Argument(metavar="PATH", )] \
+                = default_thirdorder_vasp_path,
+        pattern: Annotated[
+            str, typer.Option(help="negative integer (n-th) or positive float (Ang)")]
+        = "job*",
 ):
     """
     run the thirdorder_vasp.py reap
@@ -62,4 +77,8 @@ def reap(
     Output files:
     | FORCE_CONSTANTS_3RD
     """
-    raise NotImplementedError
+    check_thirdorder_vasp(thirdorder_vasp_path)
+    python_command = "python"
+    main_command = f"{python_command} {thirdorder_vasp_path} reap {supercell} {cutoff}"
+    command = f"find {pattern} -name vasprun.xml | sort -n | {main_command}"
+    run(command, shell=True)
