@@ -78,6 +78,16 @@ def add_commands(parent):
     pbs.command("runsh")(run_sh_with_pbs)
     pbs.command("runpy")(run_py_with_pbs)
 
+    # shengbte 主命令
+    shengbte = typer.Typer(no_args_is_help=True,
+                      invoke_without_command=True)
+    parent.add_typer(shengbte, name="shengbte", help="ShengBTE tools")
+
+    # shengbte 子命令
+    from hanetoolpy.functions.shengbte import shengbte_run, poscar_to_control
+    shengbte.command("run")(shengbte_run)
+    shengbte.command("control")(poscar_to_control)
+
     # # test
     # test = typer.Typer(
     #     no_args_is_help=True,
