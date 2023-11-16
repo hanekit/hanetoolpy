@@ -1,5 +1,6 @@
 import logging
-from typing import Annotated, Tuple, Union
+from typing_extensions import Annotated
+from typing import Tuple, Union
 
 import typer
 from hanetoolpy.io.shengbte import Control
