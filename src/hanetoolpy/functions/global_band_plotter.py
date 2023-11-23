@@ -5,15 +5,15 @@ from logging import info
 
 import matplotlib
 import numpy as np
-import pandas as pd
 import typer
-from hanetoolpy.utils.vasp.eigenval import Eigenval
-from hanetoolpy.utils.vasp.outcar import get_fermi_energy
 from matplotlib import pyplot as plt
 from matplotlib.patches import Polygon
 from rich.console import Console
 from rich.table import Table
 from typing_extensions import Annotated
+
+from hanetoolpy.utils.vasp.eigenval import Eigenval
+from hanetoolpy.utils.vasp.outcar import get_fermi_energy
 
 matplotlib.use('Agg')
 logging.basicConfig(level=logging.INFO,

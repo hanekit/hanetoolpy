@@ -55,16 +55,21 @@ def sow(
 
 def reap(
         supercell: Annotated[
-            Tuple[int, int, int], typer.Argument(metavar="[INT * 3]",
-                                                 help="size of supercell")],
+            Tuple[int, int, int],
+            typer.Argument(metavar="[INT * 3]",
+                           help="size of supercell")],
         cutoff: Annotated[
-            str, typer.Argument(metavar="-INT|+FLOAT",
-                                help="negative integer (n-th) or positive float (Ang)")],
-        thirdorder_vasp_path: Annotated[str, typer.Argument(metavar="PATH", )] \
+            str,
+            typer.Argument(metavar="-INT|+FLOAT",
+                           help="negative integer (n-th) or positive float (Ang)")],
+        thirdorder_vasp_path: Annotated[
+            str,
+            typer.Argument(metavar="PATH", )]
                 = default_thirdorder_vasp_path,
         pattern: Annotated[
-            str, typer.Option(help="negative integer (n-th) or positive float (Ang)")]
-        = "job*",
+            str,
+            typer.Option(help="negative integer (n-th) or positive float (Ang)")]
+                = "job*",
 ):
     """
     run the thirdorder_vasp.py reap
@@ -79,6 +84,7 @@ def reap(
     """
     check_thirdorder_vasp(thirdorder_vasp_path)
     python_command = "python"
+    supercell = " ".join(map(str, supercell))
     main_command = f"{python_command} {thirdorder_vasp_path} reap {supercell} {cutoff}"
     command = f"find {pattern} -name vasprun.xml | sort -n | {main_command}"
     run(command, shell=True)

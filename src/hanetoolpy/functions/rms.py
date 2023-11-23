@@ -1,12 +1,12 @@
-from typing import Tuple
 import logging
 from pathlib import Path
-from typing_extensions import Annotated
+from typing import Tuple
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import typer
+from typing_extensions import Annotated
 
 tensor = ["xx", "xy", "xz",
           "yx", "yy", "yz",
@@ -54,8 +54,9 @@ def plot_rms(df, order=False, poscar=None, supercell=None):
     y = df["rms"]
     plt.scatter(x, y, marker='+', s=50, alpha=1)
     if order:
-        from hanetoolpy.functions.thirdorder import get_order_distance
         import numpy as np
+
+        from hanetoolpy.functions.thirdorder import get_order_distance
         result = get_order_distance(poscar, supercell)
         order = np.array(list(result.keys()))
         distance = np.array(list(result.values())) * 10

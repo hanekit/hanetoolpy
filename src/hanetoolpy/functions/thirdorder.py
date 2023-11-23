@@ -35,7 +35,7 @@ def check_thirdorder_jobs(path: str = "./",
             status.append("_")
     status_text = "".join(status)
     status_count = {}
-    status_count["finished"] = status.count("#")
+    status_count["finished"] = status.count("#") + status.count("S")
     status_count["unfinished"] = len(status_text) - status.count("#")
     status_count["running"] = status.count("R")
     status_count["unstarted"] = status.count("_")
